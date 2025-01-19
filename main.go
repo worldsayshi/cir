@@ -1,18 +1,24 @@
 package main
 
 import (
+	"strings"
+
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 func main() {
 	newPrimitive := func(text string) tview.Primitive {
-		return tview.NewTextView().
-			// SetTextAlign(tview.AlignCenter).
+		p := tview.NewTextView()
+		p.
 			SetBorder(true).
 			SetTitle(text)
+		return p
 	}
 
-	chatHistory := newPrimitive("History")
+	messages := []string{}
+
+	chatHistory := newPrimitive("History").(*tview.TextView)
 	contextBar := newPrimitive("Context")
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
@@ -20,15 +26,30 @@ func main() {
 		SetBorder(true).
 		SetTitle("Input")
 
-	// grid := tview.NewGrid().
-	// 	SetRows(3, 0, 3).
-	// 	SetBorders(true)
-	//
-	// grid.AddItem(chatHistory, 10, 0, 0, 0, 0, 100, false).
-	// 	AddItem(contextBar, 1, 0, 0, 0, 0, 100, false).
-	// 	AddItem(textInputArea, 2, 2, 2, 2, 0, 100, true)
+	// textInputArea.SetDoneFunc(func(key tcell.Key) {
+	// 	if key == tcell.KeyEnter {
+	// 		text := textInputArea.GetText()
+	// 		if text != "" {
+	// 			messages = append(messages, text)
+	// 			chatHistory.SetText(strings.Join(messages, "\n"))
+	// 			textInputArea.SetText("", true)
+	// 		}
+	// 	}
+	// })
 
-	// box := tview.NewBox().SetBorder(true).SetTitle("Hello, world!")
+	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyCtrlS {
+			text := textInputArea.GetText()
+			if text != "" {
+				messages = append(messages, text)
+				chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+				textInputArea.SetText("", true)
+			}
+			return nil
+		}
+		return event
+	})
+
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(chatHistory, 0, 5, false).
 		AddItem(contextBar, 0, 1, false).
