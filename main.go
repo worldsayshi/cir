@@ -1,13 +1,55 @@
 package main
 
 import (
+	"log"
+	"os"
+	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
+const sessionFile = "./.go-coder/default-session.yaml"
+
+func loadMessages() ([]string, error) {
+	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
+		log.Println("Session file not found, creating a new one")
+		sessionFileDir := filepath.Dir(sessionFile)
+		os.MkdirAll(sessionFileDir, 0755)
+		return []string{}, os.WriteFile(sessionFile, []byte("[]"), 0644)
+	}
+
+	data, err := os.ReadFile(sessionFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var messages []string
+	if err := yaml.Unmarshal(data, &messages); err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
+
+func saveMessages(messages []string) error {
+	data, err := yaml.Marshal(messages)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(sessionFile, data, 0644)
+}
+
 func main() {
+	messages, err := loadMessages()
+	if err != nil {
+		panic(err)
+	}
+
 	newPrimitive := func(text string) tview.Primitive {
 		p := tview.NewTextView()
 		p.
@@ -16,9 +58,8 @@ func main() {
 		return p
 	}
 
-	messages := []string{}
-
 	chatHistory := newPrimitive("History").(*tview.TextView)
+	chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
 	contextBar := newPrimitive("Context")
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
@@ -33,6 +74,9 @@ func main() {
 				messages = append(messages, text)
 				chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
 				textInputArea.SetText("", true)
+				if err := saveMessages(messages); err != nil {
+					panic(err)
+				}
 			}
 			return nil
 		}
