@@ -26,17 +26,6 @@ func main() {
 		SetBorder(true).
 		SetTitle("Input")
 
-	// textInputArea.SetDoneFunc(func(key tcell.Key) {
-	// 	if key == tcell.KeyEnter {
-	// 		text := textInputArea.GetText()
-	// 		if text != "" {
-	// 			messages = append(messages, text)
-	// 			chatHistory.SetText(strings.Join(messages, "\n"))
-	// 			textInputArea.SetText("", true)
-	// 		}
-	// 	}
-	// })
-
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
 			text := textInputArea.GetText()
