@@ -21,6 +21,63 @@ func setupLogging() (f *os.File, err error) {
 	return f, nil
 }
 
+func handleStreamResponse(resultChan chan string, errChan chan error, messages []string, lastIdx int, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
+	accumulated := ""
+	for {
+		select {
+		case chunk, ok := <-resultChan:
+			if !ok {
+				// Stream completed
+				if err := saveMessages(messages); err != nil {
+					panic(err)
+				}
+				textInputArea.SetDisabled(false)
+				return
+			}
+			accumulated += chunk
+			messages[lastIdx] = accumulated
+			chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+			chatHistory.ScrollToEnd()
+		case err := <-errChan:
+			log.Printf("Error: %v", err)
+			if err != nil {
+				messages[lastIdx] = fmt.Sprintf("Error: %v", err)
+				chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+				textInputArea.SetDisabled(false)
+				if err := saveMessages(messages); err != nil {
+					panic(err)
+				}
+				return
+			}
+		}
+	}
+}
+
+func handleChatSubmit(messages []string, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
+	text := textInputArea.GetText()
+	if text != "" {
+		messages = append(messages, text)
+		chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+		textInputArea.SetText("", true)
+		if err := saveMessages(messages); err != nil {
+			panic(err)
+		}
+
+		// Lock the text input area
+		textInputArea.SetDisabled(true)
+
+		// Add empty message for streaming response
+		messages = append(messages, "")
+		lastIdx := len(messages) - 1
+
+		// Start streaming
+		resultChan, errChan := streamOpenAI(messages[:lastIdx])
+
+		// Create a goroutine to handle streaming updates
+		go handleStreamResponse(resultChan, errChan, messages, lastIdx, chatHistory, textInputArea)
+	}
+}
+
 func main() {
 	var app *tview.Application
 	logfile, err := setupLogging()
@@ -57,58 +114,7 @@ func main() {
 
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
-			text := textInputArea.GetText()
-			if text != "" {
-				messages = append(messages, text)
-				chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
-				textInputArea.SetText("", true)
-				if err := saveMessages(messages); err != nil {
-					panic(err)
-				}
-
-				// Lock the text input area
-				textInputArea.SetDisabled(true)
-
-				// Add empty message for streaming response
-				messages = append(messages, "")
-				lastIdx := len(messages) - 1
-
-				// Start streaming
-				resultChan, errChan := streamOpenAI(messages[:lastIdx])
-
-				// Create a goroutine to handle streaming updates
-				go func() {
-					accumulated := ""
-					for {
-						select {
-						case chunk, ok := <-resultChan:
-							if !ok {
-								// Stream completed
-								if err := saveMessages(messages); err != nil {
-									panic(err)
-								}
-								textInputArea.SetDisabled(false)
-								return
-							}
-							accumulated += chunk
-							messages[lastIdx] = accumulated
-							chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
-							chatHistory.ScrollToEnd()
-						case err := <-errChan:
-							log.Printf("Error: %v", err)
-							if err != nil {
-								messages[lastIdx] = fmt.Sprintf("Error: %v", err)
-								chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
-								textInputArea.SetDisabled(false)
-								if err := saveMessages(messages); err != nil {
-									panic(err)
-								}
-								return
-							}
-						}
-					}
-				}()
-			}
+			handleChatSubmit(messages, chatHistory, textInputArea)
 			return nil
 		}
 		return event
