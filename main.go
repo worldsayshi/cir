@@ -84,6 +84,9 @@ func main() {
 						case chunk, ok := <-resultChan:
 							if !ok {
 								// Stream completed
+								if err := saveMessages(messages); err != nil {
+									panic(err)
+								}
 								textInputArea.SetDisabled(false)
 								return
 							}
@@ -97,6 +100,9 @@ func main() {
 								messages[lastIdx] = fmt.Sprintf("Error: %v", err)
 								chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
 								textInputArea.SetDisabled(false)
+								if err := saveMessages(messages); err != nil {
+									panic(err)
+								}
 								return
 							}
 						}
