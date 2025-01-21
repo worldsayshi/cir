@@ -28,7 +28,6 @@ func main() {
 		panic(err)
 	}
 	defer logfile.Close()
-	log.Println("Starting Go Coder")
 
 	messages, err := loadMessages()
 	if err != nil {
@@ -83,10 +82,8 @@ func main() {
 					for {
 						select {
 						case chunk, ok := <-resultChan:
-							log.Printf("Received chunk: %v", chunk)
 							if !ok {
 								// Stream completed
-								log.Println("Stream completed")
 								textInputArea.SetDisabled(false)
 								return
 							}

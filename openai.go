@@ -26,13 +26,9 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 	resultChan := make(chan string)
 	errChan := make(chan error)
 
-	log.Println("Streaming to OpenAI")
-
 	go func() {
 		defer close(resultChan)
 		defer close(errChan)
-
-		log.Println("Sending messages to OpenAI:", messages)
 
 		openAIMessages := []Message{}
 		for _, msg := range messages {
@@ -77,7 +73,6 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 			return
 		}
 
-		//log.Println("resp:", resp)
 		defer resp.Body.Close()
 
 		reader := bufio.NewReader(resp.Body)
@@ -92,11 +87,8 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 				return
 			}
 
-			log.Println("Line-with-prefix:", string(line))
-
+			// Why is this prefix here?
 			line = bytes.TrimPrefix(bytes.TrimSpace(line), []byte("data: "))
-
-			log.Println("Line:", string(line))
 
 			if len(line) == 0 {
 				continue
@@ -112,7 +104,6 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 			}
 
 			if string(line) == "[DONE]" {
-				log.Println("Stream completed")
 				return
 			}
 
@@ -123,18 +114,13 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 				return
 			}
 
-			log.Println("Chunk:", chunk)
-
 			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
 				resultChan <- chunk.Choices[0].Delta.Content
 			}
 
 			if chunk.Choices[0].FinishReason != nil && *chunk.Choices[0].FinishReason == "stop" {
-				log.Println("Stream completed")
 				return
 			}
-
-			log.Println("Result:", chunk.Choices[0].Delta.Content)
 		}
 	}()
 
