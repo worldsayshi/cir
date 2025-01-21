@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -8,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"reflect"
 )
 
 type OpenAIRequest struct {
@@ -45,16 +45,12 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 			Stream:   true,
 		}
 
-		log.Println("Request body:", reqBody)
-
 		jsonData, err := json.Marshal(reqBody)
 		if err != nil {
 			log.Println("Error marshalling request body:", err)
 			errChan <- err
 			return
 		}
-
-		log.Println("Request JSON:", string(jsonData))
 
 		req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonData))
 		if err != nil {
@@ -63,16 +59,12 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 			return
 		}
 
-		log.Println("Request:", req)
-
 		apiKey := os.Getenv("OPENAI_API_KEY")
 		if apiKey == "" {
 			log.Println("OPENAI_API_KEY environment variable not set")
 			errChan <- fmt.Errorf("OPENAI_API_KEY environment variable not set")
 			return
 		}
-
-		log.Println("API key retrieved")
 
 		req.Header.Set("Authorization", "Bearer "+apiKey)
 		req.Header.Set("Content-Type", "application/json")
@@ -85,28 +77,48 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 			return
 		}
 
-		log.Println("Response:", resp)
-		log.Printf("Response body: %+v\n", &resp.Body)
-		log.Println("Response body type:", reflect.TypeOf(resp.Body))
-
+		//log.Println("resp:", resp)
 		defer resp.Body.Close()
 
-		decoder := json.NewDecoder(resp.Body)
+		reader := bufio.NewReader(resp.Body)
 		for {
+			line, err := reader.ReadBytes('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				log.Println("Error reading response:", err)
+				errChan <- err
+				return
+			}
+
+			log.Println("Line-with-prefix:", string(line))
+
+			line = bytes.TrimPrefix(bytes.TrimSpace(line), []byte("data: "))
+
+			log.Println("Line:", string(line))
+
+			if len(line) == 0 {
+				continue
+			}
+
 			var chunk struct {
 				Choices []struct {
 					Delta struct {
 						Content string `json:"content"`
 					} `json:"delta"`
+					FinishReason *string `json:"finish_reason"`
 				} `json:"choices"`
 			}
 
-			if err := decoder.Decode(&chunk); err != nil {
-				if err == io.EOF {
-					break
-				}
+			if string(line) == "[DONE]" {
+				log.Println("Stream completed")
+				return
+			}
+
+			if err := json.Unmarshal(line, &chunk); err != nil {
 				log.Println("Error decoding response:", err)
-				log.Println("Response:", chunk)
+				log.Println("Response:", string(line))
 				errChan <- err
 				return
 			}
@@ -115,6 +127,11 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 
 			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
 				resultChan <- chunk.Choices[0].Delta.Content
+			}
+
+			if chunk.Choices[0].FinishReason != nil && *chunk.Choices[0].FinishReason == "stop" {
+				log.Println("Stream completed")
+				return
 			}
 
 			log.Println("Result:", chunk.Choices[0].Delta.Content)

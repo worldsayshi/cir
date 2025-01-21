@@ -22,6 +22,7 @@ func setupLogging() (f *os.File, err error) {
 }
 
 func main() {
+	var app *tview.Application
 	logfile, err := setupLogging()
 	if err != nil {
 		panic(err)
@@ -50,6 +51,10 @@ func main() {
 	textInputArea.
 		SetBorder(true).
 		SetTitle("Input")
+	chatHistory.
+		SetChangedFunc(func() {
+			app.Draw()
+		})
 
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
@@ -110,7 +115,8 @@ func main() {
 		AddItem(chatHistory, 0, 5, false).
 		AddItem(contextBar, 0, 1, false).
 		AddItem(textInputArea, 0, 2, true)
-	if err := tview.NewApplication().
+	app = tview.NewApplication()
+	if err := app.
 		SetRoot(flex, true).
 		SetFocus(textInputArea).Run(); err != nil {
 		panic(err)
