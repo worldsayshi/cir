@@ -17,11 +17,6 @@ type OpenAIRequest struct {
 	Stream   bool      `json:"stream"`
 }
 
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
-}
-
 func streamOpenAI(messages []string) (chan string, chan error) {
 	resultChan := make(chan string)
 	errChan := make(chan error)
