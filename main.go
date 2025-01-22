@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"os/exec"
 )
 
 func setupLogging() (f *os.File, err error) {
@@ -15,20 +14,6 @@ func setupLogging() (f *os.File, err error) {
 
 	log.SetOutput(f)
 	return f, nil
-}
-
-func addContextFile() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h"
-	out, err := exec.Command(
-		"bash", "-c", cmd,
-		// "find", ".", "-type", "f", "-not", "-path", "'*/.*'", "|", "fzf-tmux", "-h"
-	).CombinedOutput() // "50%", "--preview", "'bat --color=always {}'")
-	//out, err := cmd.CombinedOutput()
-	log.Printf("Output1: %s", out)
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("Output: %s", out)
 }
 
 func main() {

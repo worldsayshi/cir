@@ -17,7 +17,7 @@ type OpenAIRequest struct {
 	Stream   bool      `json:"stream"`
 }
 
-func streamOpenAI(messages []string) (chan string, chan error) {
+func streamOpenAI(messages []Message) (chan string, chan error) {
 	resultChan := make(chan string)
 	errChan := make(chan error)
 
@@ -25,10 +25,7 @@ func streamOpenAI(messages []string) (chan string, chan error) {
 		defer close(resultChan)
 		defer close(errChan)
 
-		openAIMessages := []Message{}
-		for _, msg := range messages {
-			openAIMessages = append(openAIMessages, Message{Role: "user", Content: msg})
-		}
+		openAIMessages := messages[:]
 
 		reqBody := OpenAIRequest{
 			Model:    "gpt-4o-2024-08-06",

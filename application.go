@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os/exec"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -19,7 +20,8 @@ type CirApplication struct {
 	chatHistory   *tview.TextView
 	textInputArea *tview.TextArea
 	contextBar    tview.Primitive
-	messages      []string
+	messages      []Message
+	contextFiles  []string
 }
 
 func NewCirApplication() *CirApplication {
@@ -38,8 +40,8 @@ func NewCirApplication() *CirApplication {
 	}
 
 	chatHistory := newPrimitive("History").(*tview.TextView)
-	chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
-	chatHistory.ScrollToEnd()
+
+	renderMessages(chatHistory, messages)
 	contextBar := newPrimitive("Context")
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
@@ -65,13 +67,35 @@ func NewCirApplication() *CirApplication {
 			return nil
 		}
 		if event.Key() == tcell.KeyCtrlO {
-			addContextFile()
+			cirApp.addContextFile()
 			return nil
 		}
 		return event
 	})
 
 	return cirApp
+}
+
+func renderMessages(chatHistory *tview.TextView, messages []Message) {
+	msgsString := []string{}
+	for _, msg := range messages {
+		msgsString = append(msgsString, msg.Content)
+	}
+	chatHistory.SetText(strings.Join(msgsString, "\n\n---\n"))
+	chatHistory.ScrollToEnd()
+}
+
+func (app *CirApplication) addContextFile() {
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h"
+	out, err := exec.Command(
+		"bash", "-c", cmd,
+		// "find", ".", "-type", "f", "-not", "-path", "'*/.*'", "|", "fzf-tmux", "-h"
+	).CombinedOutput() // "50%", "--preview", "'bat --color=always {}'")
+	if err != nil {
+		log.Println(err)
+	}
+	//file, err := os.Open(string(out))
+	app.contextFiles = append(app.contextFiles, string(out))
 }
 
 func (app *CirApplication) Run() error {
@@ -90,29 +114,30 @@ func (app *CirApplication) Run() error {
 func (app *CirApplication) handleChatSubmit() {
 	text := app.textInputArea.GetText()
 	if text != "" {
-		(*app).messages = append(app.messages, text)
-		(*app).chatHistory.SetText(strings.Join((*app).messages, "\n\n---\n"))
-		(*app).textInputArea.SetText("", true)
+		app.messages = append(app.messages, Message{Role: "user", Content: text})
+		renderMessages(app.chatHistory, app.messages)
+		//app.chatHistory.SetText(strings.Join(app.messages, "\n\n---\n"))
+		app.textInputArea.SetText("", true)
 		if err := saveMessages(app.messages); err != nil {
 			panic(err)
 		}
 
 		// Lock the text input area
-		(*app).textInputArea.SetDisabled(true)
+		app.textInputArea.SetDisabled(true)
 
 		// Add empty message for streaming response
-		(*app).messages = append((*app).messages, "")
-		lastIdx := len((*app).messages) - 1
+		app.messages = append(app.messages, Message{Role: "system", Content: ""})
+		lastIdx := len(app.messages) - 1
 
 		// Start streaming
-		resultChan, errChan := streamOpenAI((app.messages)[:lastIdx])
+		resultChan, errChan := streamOpenAI(app.messages[:lastIdx])
 
 		// Create a goroutine to handle streaming updates
-		go handleStreamResponse(app, resultChan, errChan)
+		go app.handleStreamResponse(resultChan, errChan)
 	}
 }
 
-func handleStreamResponse(app *CirApplication, resultChan chan string, errChan chan error) {
+func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan chan error) {
 	accumulated := ""
 	lastIdx := len((*app).messages) - 1
 	for {
@@ -127,14 +152,16 @@ func handleStreamResponse(app *CirApplication, resultChan chan string, errChan c
 				return
 			}
 			accumulated += chunk
-			app.messages[lastIdx] = accumulated
-			app.chatHistory.SetText(strings.Join((*app).messages, "\n\n---\n"))
-			app.chatHistory.ScrollToEnd()
+			app.messages[lastIdx].Content = accumulated
+			renderMessages(app.chatHistory, app.messages)
+			// app.chatHistory.SetText(strings.Join(app.messages, "\n\n---\n"))
+			// app.chatHistory.ScrollToEnd()
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
-				app.messages[lastIdx] = fmt.Sprintf("Error: %v", err)
-				app.chatHistory.SetText(strings.Join((*app).messages, "\n\n---\n"))
+				app.messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
+				renderMessages(app.chatHistory, app.messages)
+				//app.chatHistory.SetText(strings.Join((*app).messages, "\n\n---\n"))
 				app.textInputArea.SetDisabled(false)
 				if err := saveMessages((*app).messages); err != nil {
 					panic(err)

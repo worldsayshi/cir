@@ -10,12 +10,12 @@ import (
 
 const sessionFile = "./.go-coder/default-session.yaml"
 
-func loadMessages() ([]string, error) {
+func loadMessages() ([]Message, error) {
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
 		os.MkdirAll(sessionFileDir, 0755)
-		return []string{}, os.WriteFile(sessionFile, []byte("[]"), 0644)
+		return []Message{}, os.WriteFile(sessionFile, []byte("[]"), 0644)
 	}
 
 	data, err := os.ReadFile(sessionFile)
@@ -23,7 +23,7 @@ func loadMessages() ([]string, error) {
 		return nil, err
 	}
 
-	var messages []string
+	var messages []Message
 	if err := yaml.Unmarshal(data, &messages); err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func loadMessages() ([]string, error) {
 	return messages, nil
 }
 
-func saveMessages(messages []string) error {
+func saveMessages(messages []Message) error {
 	data, err := yaml.Marshal(messages)
 	if err != nil {
 		return err
