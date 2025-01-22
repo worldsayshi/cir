@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -21,30 +22,30 @@ func setupLogging() (f *os.File, err error) {
 	return f, nil
 }
 
-func handleStreamResponse(resultChan chan string, errChan chan error, messages []string, lastIdx int, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
+func handleStreamResponse(resultChan chan string, errChan chan error, messages *[]string, lastIdx int, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
 	accumulated := ""
 	for {
 		select {
 		case chunk, ok := <-resultChan:
 			if !ok {
 				// Stream completed
-				if err := saveMessages(messages); err != nil {
+				if err := saveMessages(*messages); err != nil {
 					panic(err)
 				}
 				textInputArea.SetDisabled(false)
 				return
 			}
 			accumulated += chunk
-			messages[lastIdx] = accumulated
-			chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+			(*messages)[lastIdx] = accumulated
+			chatHistory.SetText(strings.Join(*messages, "\n\n---\n"))
 			chatHistory.ScrollToEnd()
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
-				messages[lastIdx] = fmt.Sprintf("Error: %v", err)
-				chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+				(*messages)[lastIdx] = fmt.Sprintf("Error: %v", err)
+				chatHistory.SetText(strings.Join(*messages, "\n\n---\n"))
 				textInputArea.SetDisabled(false)
-				if err := saveMessages(messages); err != nil {
+				if err := saveMessages(*messages); err != nil {
 					panic(err)
 				}
 				return
@@ -53,13 +54,13 @@ func handleStreamResponse(resultChan chan string, errChan chan error, messages [
 	}
 }
 
-func handleChatSubmit(messages []string, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
+func handleChatSubmit(messages *[]string, chatHistory *tview.TextView, textInputArea *tview.TextArea) {
 	text := textInputArea.GetText()
 	if text != "" {
-		messages = append(messages, text)
-		chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+		*messages = append(*messages, text)
+		chatHistory.SetText(strings.Join(*messages, "\n\n---\n"))
 		textInputArea.SetText("", true)
-		if err := saveMessages(messages); err != nil {
+		if err := saveMessages(*messages); err != nil {
 			panic(err)
 		}
 
@@ -67,15 +68,29 @@ func handleChatSubmit(messages []string, chatHistory *tview.TextView, textInputA
 		textInputArea.SetDisabled(true)
 
 		// Add empty message for streaming response
-		messages = append(messages, "")
-		lastIdx := len(messages) - 1
+		*messages = append(*messages, "")
+		lastIdx := len(*messages) - 1
 
 		// Start streaming
-		resultChan, errChan := streamOpenAI(messages[:lastIdx])
+		resultChan, errChan := streamOpenAI((*messages)[:lastIdx])
 
 		// Create a goroutine to handle streaming updates
 		go handleStreamResponse(resultChan, errChan, messages, lastIdx, chatHistory, textInputArea)
 	}
+}
+
+func addContextFile() {
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h"
+	out, err := exec.Command(
+		"bash", "-c", cmd,
+		// "find", ".", "-type", "f", "-not", "-path", "'*/.*'", "|", "fzf-tmux", "-h"
+	).CombinedOutput() // "50%", "--preview", "'bat --color=always {}'")
+	//out, err := cmd.CombinedOutput()
+	log.Printf("Output1: %s", out)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Output: %s", out)
 }
 
 func main() {
@@ -101,6 +116,7 @@ func main() {
 
 	chatHistory := newPrimitive("History").(*tview.TextView)
 	chatHistory.SetText(strings.Join(messages, "\n\n---\n"))
+	chatHistory.ScrollToEnd()
 	contextBar := newPrimitive("Context")
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
@@ -114,7 +130,11 @@ func main() {
 
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
-			handleChatSubmit(messages, chatHistory, textInputArea)
+			handleChatSubmit(&messages, chatHistory, textInputArea)
+			return nil
+		}
+		if event.Key() == tcell.KeyCtrlO {
+			addContextFile()
 			return nil
 		}
 		return event
