@@ -116,7 +116,6 @@ func (app *CirApplication) handleChatSubmit() {
 	if text != "" {
 		app.messages = append(app.messages, Message{Role: "user", Content: text})
 		renderMessages(app.chatHistory, app.messages)
-		//app.chatHistory.SetText(strings.Join(app.messages, "\n\n---\n"))
 		app.textInputArea.SetText("", true)
 		if err := saveMessages(app.messages); err != nil {
 			panic(err)
@@ -154,14 +153,11 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 			accumulated += chunk
 			app.messages[lastIdx].Content = accumulated
 			renderMessages(app.chatHistory, app.messages)
-			// app.chatHistory.SetText(strings.Join(app.messages, "\n\n---\n"))
-			// app.chatHistory.ScrollToEnd()
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
 				app.messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
 				renderMessages(app.chatHistory, app.messages)
-				//app.chatHistory.SetText(strings.Join((*app).messages, "\n\n---\n"))
 				app.textInputArea.SetDisabled(false)
 				if err := saveMessages((*app).messages); err != nil {
 					panic(err)
