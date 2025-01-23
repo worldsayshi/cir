@@ -8,7 +8,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const sessionFile = "./.go-coder/default-session.yaml"
+var sessionFile = getSessionFilePath()
+
+func getSessionFilePath() string {
+	if path := os.Getenv("TEST_SESSION_FILE"); path != "" {
+		return path
+	}
+	return "./.go-coder/default-session.yaml"
+}
 
 func loadWorkingSession() (*WorkingSession, error) {
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
@@ -23,12 +30,12 @@ func loadWorkingSession() (*WorkingSession, error) {
 		return nil, err
 	}
 
-	var workingSession *WorkingSession
-	if err := yaml.Unmarshal(data, workingSession); err != nil {
+	var workingSession WorkingSession
+	if err := yaml.Unmarshal(data, &workingSession); err != nil {
 		return nil, err
 	}
 
-	return workingSession, nil
+	return &workingSession, nil
 }
 
 func saveWorkingSession(workingSession *WorkingSession) error {
