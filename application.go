@@ -42,7 +42,7 @@ func NewCirApplication() *CirApplication {
 	chatHistory := newPrimitive("History").(*tview.TextView)
 
 	renderMessages(chatHistory, messages)
-	contextBar := newPrimitive("Context")
+	contextBar := newPrimitive("Context").(*tview.TextView)
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
 	textInputArea.
@@ -67,7 +67,7 @@ func NewCirApplication() *CirApplication {
 			return nil
 		}
 		if event.Key() == tcell.KeyCtrlO {
-			cirApp.addContextFile()
+			cirApp.addContextFiles()
 			return nil
 		}
 		return event
@@ -85,17 +85,29 @@ func renderMessages(chatHistory *tview.TextView, messages []Message) {
 	chatHistory.ScrollToEnd()
 }
 
-func (app *CirApplication) addContextFile() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h"
+func renderContextFiles(contextBar *tview.TextView, s []string) {
+	contextBar.SetText(strings.Join(s, " | "))
+}
+
+func (app *CirApplication) addContextFiles() {
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
 	out, err := exec.Command(
 		"bash", "-c", cmd,
-		// "find", ".", "-type", "f", "-not", "-path", "'*/.*'", "|", "fzf-tmux", "-h"
-	).CombinedOutput() // "50%", "--preview", "'bat --color=always {}'")
+	).CombinedOutput()
 	if err != nil {
 		log.Println(err)
 	}
-	//file, err := os.Open(string(out))
-	app.contextFiles = append(app.contextFiles, string(out))
+
+	contextFiles := strings.Split(string(out), "\n")
+	// filter out empty strings
+	filtered := []string{}
+	for _, f := range contextFiles {
+		if f != "" {
+			filtered = append(filtered, f)
+		}
+	}
+	app.contextFiles = append(app.contextFiles, filtered...)
+	renderContextFiles(app.contextBar, app.contextFiles)
 }
 
 func (app *CirApplication) Run() error {
