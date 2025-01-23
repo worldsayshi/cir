@@ -31,8 +31,6 @@ type CirApplication struct {
 	textInputArea  *tview.TextArea
 	contextBar     *tview.TextView
 	workingSession *WorkingSession
-	//messages     []Message
-	//contextFiles []string
 }
 
 func NewCirApplication() *CirApplication {
