@@ -55,3 +55,41 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadNewWorkingSession(t *testing.T) {
+	tmpDir := t.TempDir()
+	testSessionFile := filepath.Join(tmpDir, "test-session.yaml")
+	os.Setenv("TEST_SESSION_FILE", testSessionFile)
+
+	// Ensure no session file exists
+	if _, err := os.Stat(testSessionFile); !os.IsNotExist(err) {
+		t.Fatalf("Session file should not exist")
+	}
+
+	// Load session, which should create a new one
+	workingSession, err := loadWorkingSession()
+	if err != nil {
+		t.Fatalf("Failed to load new session: %v", err)
+	}
+
+	// Assert that the session is empty
+	if len(workingSession.Messages) != 0 || len(workingSession.WorkingFiles) != 0 {
+		t.Fatalf("New session should be empty")
+	}
+
+	// Ensure the session file was created
+	if _, err := os.Stat(testSessionFile); os.IsNotExist(err) {
+		t.Fatalf("Session file should have been created")
+	}
+
+	// Load the session again to ensure it is still empty
+	loadedSession, err := loadWorkingSession()
+	if err != nil {
+		t.Fatalf("Failed to load session: %v", err)
+	}
+
+	// Assert that the loaded session is still empty
+	if len(loadedSession.Messages) != 0 || len(loadedSession.WorkingFiles) != 0 {
+		t.Fatalf("Loaded session should be empty")
+	}
+}
