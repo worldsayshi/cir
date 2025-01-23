@@ -10,7 +10,6 @@ import (
 func TestSaveAndLoadWorkingSession(t *testing.T) {
 	tmpDir := t.TempDir()
 	testSessionFile := filepath.Join(tmpDir, "test-session.yaml")
-	os.Setenv("TEST_SESSION_FILE", testSessionFile)
 
 	// Prepare a session to save
 	session := &WorkingSession{
@@ -25,12 +24,12 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 	}
 
 	// Try saving
-	if err := saveWorkingSession(session); err != nil {
+	if err := saveWorkingSession(testSessionFile, session); err != nil {
 		t.Fatalf("Failed to save session: %v", err)
 	}
 
 	// Now load it back
-	loadedSession, err := loadWorkingSession()
+	loadedSession, err := loadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load session: %v", err)
 	}
@@ -57,7 +56,6 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 func TestLoadNewWorkingSession(t *testing.T) {
 	tmpDir := t.TempDir()
 	testSessionFile := filepath.Join(tmpDir, "test-session.yaml")
-	os.Setenv("TEST_SESSION_FILE", testSessionFile)
 
 	// Ensure no session file exists
 	if _, err := os.Stat(testSessionFile); !os.IsNotExist(err) {
@@ -65,7 +63,7 @@ func TestLoadNewWorkingSession(t *testing.T) {
 	}
 
 	// Load session, which should create a new one
-	workingSession, err := loadWorkingSession()
+	workingSession, err := loadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load new session: %v", err)
 	}
@@ -82,7 +80,7 @@ func TestLoadNewWorkingSession(t *testing.T) {
 	}
 
 	// Load the session again to ensure it is still empty
-	loadedSession, err := loadWorkingSession()
+	loadedSession, err := loadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load session: %v", err)
 	}

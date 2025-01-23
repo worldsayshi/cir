@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 )
@@ -17,6 +18,8 @@ func setupLogging() (f *os.File, err error) {
 }
 
 func main() {
+	sessionFile := flag.String("session", "./.go-coder/default-session.yaml", "path to the session file")
+	flag.Parse()
 
 	logfile, err := setupLogging()
 	if err != nil {
@@ -24,7 +27,7 @@ func main() {
 	}
 	defer logfile.Close()
 
-	cirApp := NewCirApplication()
+	cirApp := NewCirApplication(*sessionFile)
 
 	if err := cirApp.Run(); err != nil {
 		panic(err)

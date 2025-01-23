@@ -17,12 +17,12 @@ func getSessionFilePath() string {
 	return "./.go-coder/default-session.yaml"
 }
 
-func loadWorkingSession() (*WorkingSession, error) {
+func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
 		os.MkdirAll(sessionFileDir, 0755)
-		return &WorkingSession{}, saveWorkingSession(&WorkingSession{})
+		return &WorkingSession{}, saveWorkingSession(sessionFile, &WorkingSession{})
 	}
 
 	data, err := os.ReadFile(sessionFile)
@@ -38,7 +38,7 @@ func loadWorkingSession() (*WorkingSession, error) {
 	return &workingSession, nil
 }
 
-func saveWorkingSession(workingSession *WorkingSession) error {
+func saveWorkingSession(sessionFile string, workingSession *WorkingSession) error {
 	data, err := yaml.Marshal(workingSession)
 	if err != nil {
 		return err

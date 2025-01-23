@@ -31,9 +31,10 @@ type CirApplication struct {
 	textInputArea  *tview.TextArea
 	contextBar     *tview.TextView
 	workingSession *WorkingSession
+	sessionFile    string
 }
 
-func NewCirApplication() *CirApplication {
+func NewCirApplication(sessionFile string) *CirApplication {
 	app := tview.NewApplication()
 	newPrimitive := func(text string) tview.Primitive {
 		p := tview.NewTextView()
@@ -43,7 +44,7 @@ func NewCirApplication() *CirApplication {
 		return p
 	}
 
-	workingSession, err := loadWorkingSession()
+	workingSession, err := loadWorkingSession(sessionFile)
 	if err != nil {
 		panic(err)
 	}
@@ -68,6 +69,7 @@ func NewCirApplication() *CirApplication {
 		textInputArea:  textInputArea,
 		contextBar:     contextBar,
 		workingSession: workingSession,
+		sessionFile:    sessionFile,
 	}
 
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -142,7 +144,7 @@ func (app *CirApplication) handleChatSubmit() {
 		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: text})
 		renderMessages(app.chatHistory, app.workingSession.Messages)
 		app.textInputArea.SetText("", true)
-		if err := saveWorkingSession(app.workingSession); err != nil {
+		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 			panic(err)
 		}
 
@@ -169,7 +171,7 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 		case chunk, ok := <-resultChan:
 			if !ok {
 				// Stream completed
-				if err := saveWorkingSession(app.workingSession); err != nil {
+				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 					panic(err)
 				}
 				app.textInputArea.SetDisabled(false)
@@ -184,7 +186,7 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 				app.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
 				renderMessages(app.chatHistory, app.workingSession.Messages)
 				app.textInputArea.SetDisabled(false)
-				if err := saveWorkingSession(app.workingSession); err != nil {
+				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 					panic(err)
 				}
 				return
