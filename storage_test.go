@@ -24,8 +24,6 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 		},
 	}
 
-	fmt.Println("Session:", session)
-
 	// Try saving
 	if err := saveWorkingSession(session); err != nil {
 		t.Fatalf("Failed to save session: %v", err)
@@ -74,6 +72,7 @@ func TestLoadNewWorkingSession(t *testing.T) {
 
 	// Assert that the session is empty
 	if len(workingSession.Messages) != 0 || len(workingSession.WorkingFiles) != 0 {
+		fmt.Println("Session:", workingSession)
 		t.Fatalf("New session should be empty")
 	}
 
