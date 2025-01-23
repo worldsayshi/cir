@@ -49,10 +49,16 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		panic(err)
 	}
 
+	// Chat history
 	chatHistory := newPrimitive("History").(*tview.TextView)
-
 	renderMessages(chatHistory, workingSession.Messages)
+
+	// Context bar
 	contextBar := newPrimitive("Context").(*tview.TextView)
+	log.Println("WorkingFiles", workingSession.WorkingFiles)
+	renderContextFiles(contextBar, workingSession.WorkingFiles)
+
+	// Text input area
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
 	textInputArea.
@@ -122,6 +128,9 @@ func (app *CirApplication) editContextFiles() {
 		}
 	}
 	app.workingSession.WorkingFiles = filteredWorkingFiles
+	if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+		panic(err)
+	}
 	renderContextFiles(app.contextBar, app.workingSession.WorkingFiles)
 }
 
