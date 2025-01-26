@@ -21,7 +21,6 @@ messages:
 working_files:
   - path: "testfile.txt"
     last_submitted_checksum: null
-    file_content: []
 `
 	if _, err := tmpSessionfile.Write([]byte(initialSessionData)); err != nil {
 		t.Fatal(err)

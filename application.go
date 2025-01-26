@@ -15,19 +15,19 @@ import (
 )
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role    string `json:"role" yaml:"role"`
+	Content string `json:"content" yaml:"content"`
 }
 
 type WorkingFile struct {
-	Path                  string  `json:"path"`
-	LastSubmittedChecksum *string `json:"last_submitted_checksum,omitempty"`
-	FileContent           []byte  `json:"file_content,omitempty"`
+	Path                  string  `json:"path" yaml:"path"`
+	LastSubmittedChecksum *string `json:"last_submitted_checksum,omitempty" yaml:"last_submitted_checksum,omitempty"`
+	FileContent           []byte  `json:"-" yaml:"-"` // Don't serialize this field
 }
 
 type WorkingSession struct {
-	Messages     []Message     `json:"messages"`
-	WorkingFiles []WorkingFile `json:"working_files"`
+	Messages     []Message     `json:"messages" yaml:"messages"`
+	WorkingFiles []WorkingFile `json:"working_files" yaml:"working_files"`
 }
 
 type CirApplication struct {
@@ -176,16 +176,14 @@ func (app *CirApplication) getFilesToSubmit() []WorkingFile {
 	return filesToSubmit
 }
 
-var promptTemplate string = `
-{{range .workingFiles}}
+var promptTemplate string = `{{- range .workingFiles -}}
 <context file="{{.Path}}">
-{{.FileContent}}
+{{ printf "%s" .FileContent }}
 </context>
-{{end}}
+{{- end }}
 <question>
-{{.Question}}
-</question>
-`
+{{.question}}
+</question>`
 
 // Add WorkingFiles to the content iff checksum is nill or changed
 func (app *CirApplication) prepareUserMessage(question string) string {

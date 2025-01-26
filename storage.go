@@ -21,14 +21,10 @@ func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("Session file content:", string(data))
 	var workingSession WorkingSession
-	if err := yaml.Unmarshal(data, &workingSession); err != nil {
+	if err := yaml.UnmarshalStrict(data, &workingSession); err != nil {
 		return nil, err
 	}
-
-	log.Printf("Working session loaded: %+v", workingSession)
 	return &workingSession, nil
 }
 
