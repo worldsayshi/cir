@@ -40,6 +40,28 @@ type CirApplication struct {
 	sessionFile    string
 }
 
+// From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
+func cycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool) {
+	for i, el := range elements {
+		if !el.HasFocus() {
+			continue
+		}
+
+		if reverse {
+			i = i - 1
+			if i < 0 {
+				i = len(elements) - 1
+			}
+		} else {
+			i = i + 1
+			i = i % len(elements)
+		}
+
+		app.SetFocus(elements[i])
+		return
+	}
+}
+
 func NewCirApplication(sessionFile string) *CirApplication {
 	app := tview.NewApplication()
 	newPrimitive := func(text string) tview.Primitive {
@@ -90,6 +112,20 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		}
 		if event.Key() == tcell.KeyCtrlO {
 			cirApp.editContextFiles()
+			return nil
+		}
+		return event
+	})
+
+	focusableElements := []tview.Primitive{chatHistory, textInputArea}
+
+	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Key() {
+		case tcell.KeyTab:
+			cycleFocus(app, focusableElements, false)
+			return nil
+		case tcell.KeyBacktab:
+			cycleFocus(app, focusableElements, true)
 			return nil
 		}
 		return event

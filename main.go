@@ -18,7 +18,7 @@ func setupLogging() (f *os.File, err error) {
 }
 
 func main() {
-	sessionFile := flag.String("session", "./.cir/default-session.yaml", "path to the session file")
+	sessionFile := flag.String("session", "~/.cir/default-session.yaml", "path to the session file")
 	flag.Parse()
 
 	logfile, err := setupLogging()

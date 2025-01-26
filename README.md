@@ -14,15 +14,17 @@ Status: Pre-Alpha
 go install github.com/worldsayshi/cir@main
 ```
 
-Then just run `cir` to start it. It will store the session in a `./.cir` folder.
+Then just run `cir` to start it. It will store the session in a `~/.cir` folder.
+For a separate session, use the `-session` flag like this: `cir -session my-session.yaml`.
 
 
 # Key bindings
 
 - Ctrl-o - Manage context
 - Ctrl-s - Submit message
+- (Shift-)Tab - Toggle focus between input and chat history
 
-# TODOs for a usable state
+# TODOs for Alpha
 
 - [X] Bug: refactor and fix messages handling so that messages are updated properly
 - [/] adding context files using fzf?
@@ -34,13 +36,17 @@ Then just run `cir` to start it. It will store the session in a `./.cir` folder.
     - [X] Add them but hide them from rendering
     - [/] Add them to the session data, calculate and store checksum whenever they are added to the sent data, only send when checksum change
 - [X] Prompt templates for sending context
-- [ ] Make the history view scrollable
+- [X] Make the history view scrollable
+- [ ] QOL: Also store the current wip chat message in the session (on exit?)
+
+# TODOs for Beta
+
 - [ ] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
-- [ ] QOL: Also store the current wip chat message in the session
+- [ ] Allow code edits
+- [ ] Bug: Getting `Error: <nil>` in log
+- [ ] Get rid of panics
 
 # Nice to have's
 
 - [ ] Plugins like [k9s plugins](https://k9scli.io/topics/plugins/)?
 - [ ] claude api support
-- [ ] Bug: Getting `Error: <nil>` in log
-- [ ] Get rid of panics
