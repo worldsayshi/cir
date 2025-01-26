@@ -9,6 +9,7 @@ import (
 )
 
 func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
+	log.Println("Loading working session from", sessionFile)
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
@@ -21,11 +22,13 @@ func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
 		return nil, err
 	}
 
+	log.Println("Session file content:", string(data))
 	var workingSession WorkingSession
 	if err := yaml.Unmarshal(data, &workingSession); err != nil {
 		return nil, err
 	}
 
+	log.Printf("Working session loaded: %+v", workingSession)
 	return &workingSession, nil
 }
 

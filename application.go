@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"fmt"
 	"html/template"
-	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -189,20 +189,14 @@ var promptTemplate string = `
 
 // Add WorkingFiles to the content iff checksum is nill or changed
 func (app *CirApplication) prepareUserMessage(question string) string {
-	log.Println("Preparing user message")
 	filesToSubmit := app.getFilesToSubmit()
-	r, w := io.Pipe()
+	var buf bytes.Buffer
 	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
-	templ.Execute(w, map[string]interface{}{
+	templ.Execute(&buf, map[string]interface{}{
 		"workingFiles": filesToSubmit,
 		"question":     question,
 	})
-	b, err := io.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("User message prepared")
-	return string(b)
+	return buf.String()
 }
 
 func (app *CirApplication) handleChatSubmit() {

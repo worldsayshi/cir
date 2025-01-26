@@ -90,3 +90,37 @@ func TestLoadNewWorkingSession(t *testing.T) {
 		t.Fatalf("Loaded session should be empty")
 	}
 }
+
+// This is a test made from a bug:
+func TestLoadFromPreMadeFile(t *testing.T) {
+	tmpSessionfile, err := os.CreateTemp("", "session-*.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Write initial session data to the file
+	initialSessionData := `
+messages:
+  - role: "user"
+    content: "Hello"
+working_files:
+  - path: "testfile.txt"
+    last_submitted_checksum: null
+    file_content: []
+`
+	if _, err := tmpSessionfile.Write([]byte(initialSessionData)); err != nil {
+		t.Fatal(err)
+	}
+	if err := tmpSessionfile.Close(); err != nil {
+		t.Fatal(err)
+	}
+	// Initialize CirApplication
+	workingSession, err := loadWorkingSession(tmpSessionfile.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Wheck that we have one file
+	if len(workingSession.WorkingFiles) != 1 {
+		t.Fatalf("Expected one file, got %d", len(workingSession.WorkingFiles))
+	}
+}
