@@ -8,15 +8,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var sessionFile = getSessionFilePath()
-
-func getSessionFilePath() string {
-	if path := os.Getenv("TEST_SESSION_FILE"); path != "" {
-		return path
-	}
-	return "./.go-coder/default-session.yaml"
-}
-
 func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
@@ -39,6 +30,10 @@ func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
 }
 
 func saveWorkingSession(sessionFile string, workingSession *WorkingSession) error {
+	// Strip out the file content from the working session before saving
+	for i := range workingSession.WorkingFiles {
+		workingSession.WorkingFiles[i].FileContent = nil
+	}
 	data, err := yaml.Marshal(workingSession)
 	if err != nil {
 		return err

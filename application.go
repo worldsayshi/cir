@@ -1,8 +1,12 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
+	"html/template"
+	"io"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -18,6 +22,7 @@ type Message struct {
 type WorkingFile struct {
 	Path                  string  `json:"path"`
 	LastSubmittedChecksum *string `json:"last_submitted_checksum,omitempty"`
+	FileContent           []byte  `json:"file_content,omitempty"`
 }
 
 type WorkingSession struct {
@@ -55,7 +60,6 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	// Context bar
 	contextBar := newPrimitive("Context").(*tview.TextView)
-	log.Println("WorkingFiles", workingSession.WorkingFiles)
 	renderContextFiles(contextBar, workingSession.WorkingFiles)
 
 	// Text input area
@@ -147,10 +151,65 @@ func (app *CirApplication) Run() error {
 	return nil
 }
 
+// Add WorkingFiles to the content iff checksum is nill or changed
+func (app *CirApplication) getFilesToSubmit() []WorkingFile {
+	filesToSubmit := []WorkingFile{}
+	for _, wf := range app.workingSession.WorkingFiles {
+		fileContents, err := os.ReadFile(wf.Path)
+		if err != nil {
+			log.Println("Error reading context file:", wf.Path, err)
+			continue
+		}
+		checksum := fmt.Sprintf("%x", md5.Sum(fileContents))
+		if wf.LastSubmittedChecksum == nil {
+			wf.LastSubmittedChecksum = &checksum
+			wf.FileContent = fileContents
+			filesToSubmit = append(filesToSubmit, wf)
+			continue
+		}
+		if checksum != *wf.LastSubmittedChecksum {
+			wf.LastSubmittedChecksum = &checksum
+			wf.FileContent = fileContents
+			filesToSubmit = append(filesToSubmit, wf)
+		}
+	}
+	return filesToSubmit
+}
+
+var promptTemplate string = `
+{{range .workingFiles}}
+<context file="{{.Path}}">
+{{.FileContent}}
+</context>
+{{end}}
+<question>
+{{.Question}}
+</question>
+`
+
+// Add WorkingFiles to the content iff checksum is nill or changed
+func (app *CirApplication) prepareUserMessage(question string) string {
+	log.Println("Preparing user message")
+	filesToSubmit := app.getFilesToSubmit()
+	r, w := io.Pipe()
+	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
+	templ.Execute(w, map[string]interface{}{
+		"workingFiles": filesToSubmit,
+		"question":     question,
+	})
+	b, err := io.ReadAll(r)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("User message prepared")
+	return string(b)
+}
+
 func (app *CirApplication) handleChatSubmit() {
 	text := app.textInputArea.GetText()
 	if text != "" {
-		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: text})
+		content := app.prepareUserMessage(text)
+		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: content})
 		renderMessages(app.chatHistory, app.workingSession.Messages)
 		app.textInputArea.SetText("", true)
 		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
