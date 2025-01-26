@@ -15,8 +15,9 @@ import (
 )
 
 type Message struct {
-	Role    string `json:"role" yaml:"role"`
-	Content string `json:"content" yaml:"content"`
+	Role     string `json:"role" yaml:"role"`
+	Content  string `json:"content" yaml:"content"`
+	Question string `json:"question,omitempty" yaml:"question,omitempty"`
 }
 
 type WorkingFile struct {
@@ -100,7 +101,11 @@ func NewCirApplication(sessionFile string) *CirApplication {
 func renderMessages(chatHistory *tview.TextView, messages []Message) {
 	msgsString := []string{}
 	for _, msg := range messages {
-		msgsString = append(msgsString, msg.Content)
+		if msg.Role == "user" {
+			msgsString = append(msgsString, msg.Question)
+		} else {
+			msgsString = append(msgsString, msg.Content)
+		}
 	}
 	chatHistory.SetText(strings.Join(msgsString, "\n\n---\n"))
 	chatHistory.ScrollToEnd()
@@ -201,7 +206,7 @@ func (app *CirApplication) handleChatSubmit() {
 	text := app.textInputArea.GetText()
 	if text != "" {
 		content := app.prepareUserMessage(text)
-		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: content})
+		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: content, Question: text})
 		renderMessages(app.chatHistory, app.workingSession.Messages)
 		app.textInputArea.SetText("", true)
 		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
