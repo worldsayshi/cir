@@ -37,7 +37,7 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
     - [/] Add them to the session data, calculate and store checksum whenever they are added to the sent data, only send when checksum change
 - [X] Prompt templates for sending context
 - [X] Make the history view scrollable
-- [ ] QOL: Also store the current wip chat message in the session (on exit?)
+- [X] QOL: Also store the current wip chat message in the session (on exit?)
 
 # TODOs for Beta
 
