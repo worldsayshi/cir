@@ -7,7 +7,7 @@ import (
 )
 
 func setupLogging() (f *os.File, err error) {
-	f, err = os.OpenFile("go-coder.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err = os.OpenFile("cir.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 		return nil, err
@@ -18,7 +18,7 @@ func setupLogging() (f *os.File, err error) {
 }
 
 func main() {
-	sessionFile := flag.String("session", "./.go-coder/default-session.yaml", "path to the session file")
+	sessionFile := flag.String("session", "./.cir/default-session.yaml", "path to the session file")
 	flag.Parse()
 
 	logfile, err := setupLogging()

@@ -1,0 +1,29 @@
+messages:
+- role: user
+  content: |2-
+
+    <question>
+    Testing
+    </question>
+  question: Testing
+- role: system
+  content: It looks like your message simply says "Testing." Could you please provide
+    more details or clarify your question? I'm here to help!
+- role: user
+  content: |-
+    <context file="./test.txt">
+    This is a test file
+
+    </context>
+    <question>
+    I&#39;m just testing a chat app here. Can you repeat back the contents of the test file?
+    </question>
+  question: I'm just testing a chat app here. Can you repeat back the contents of
+    the test file?
+- role: system
+  content: |-
+    Certainly! The contents of the test file are:
+
+    "This is a test file"
+working_files:
+- path: ./test.txt

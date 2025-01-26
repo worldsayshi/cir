@@ -1,0 +1,983 @@
+2025/01/21 10:27:34 Starting Go Coder
+2025/01/21 10:28:29 Starting Go Coder
+2025/01/21 10:28:36 Starting Go Coder
+2025/01/21 10:28:36 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/21 10:28:40 Streaming to OpenAI
+2025/01/21 10:28:40 Sending messages to OpenAI: [hi!]
+2025/01/21 10:28:40 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:40 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:40 Chunk: {[{{} <nil>}]}
+2025/01/21 10:28:40 Result: 
+2025/01/21 10:28:40 Line-with-prefix: 
+
+2025/01/21 10:28:40 Line: 
+2025/01/21 10:28:40 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:40 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:40 Chunk: {[{{Hello} <nil>}]}
+2025/01/21 10:28:40 Result: Hello
+2025/01/21 10:28:40 Line-with-prefix: 
+
+2025/01/21 10:28:40 Line: 
+2025/01/21 10:28:40 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:40 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:40 Chunk: {[{{!} <nil>}]}
+2025/01/21 10:28:40 Received chunk: Hello
+2025/01/21 10:28:40 Received chunk: !
+2025/01/21 10:28:40 Result: !
+2025/01/21 10:28:40 Line-with-prefix: 
+
+2025/01/21 10:28:40 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" How"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" How"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ How} <nil>}]}
+2025/01/21 10:28:41 Result:  How
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" can"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" can"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ can} <nil>}]}
+2025/01/21 10:28:41 Received chunk:  How
+2025/01/21 10:28:41 Received chunk:  can
+2025/01/21 10:28:41 Result:  can
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" I"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" I"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ I} <nil>}]}
+2025/01/21 10:28:41 Result:  I
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" assist"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" assist"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ assist} <nil>}]}
+2025/01/21 10:28:41 Received chunk:  I
+2025/01/21 10:28:41 Received chunk:  assist
+2025/01/21 10:28:41 Result:  assist
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ you} <nil>}]}
+2025/01/21 10:28:41 Result:  you
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" today"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" today"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{ today} <nil>}]}
+2025/01/21 10:28:41 Received chunk:  you
+2025/01/21 10:28:41 Received chunk:  today
+2025/01/21 10:28:41 Result:  today
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"?"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"?"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:28:41 Chunk: {[{{?} <nil>}]}
+2025/01/21 10:28:41 Result: ?
+2025/01/21 10:28:41 Line-with-prefix: 
+
+2025/01/21 10:28:41 Line: 
+2025/01/21 10:28:41 Line-with-prefix: data: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+
+2025/01/21 10:28:41 Line: {"id":"chatcmpl-As4sMz6uFmxfu2hSyoNyAYfroIzdJ","object":"chat.completion.chunk","created":1737451818,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+2025/01/21 10:28:41 Chunk: {[{{} 0xc000110390}]}
+2025/01/21 10:28:41 Stream completed
+2025/01/21 10:28:41 Received chunk: ?
+2025/01/21 10:28:41 Error: <nil>
+2025/01/21 10:28:41 Received chunk: 
+2025/01/21 10:28:41 Stream completed
+2025/01/21 10:30:47 Starting Go Coder
+2025/01/21 10:30:47 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/21 10:31:24 Starting Go Coder
+2025/01/21 10:32:02 Starting Go Coder
+2025/01/21 10:32:06 Streaming to OpenAI
+2025/01/21 10:32:06 Sending messages to OpenAI: [hi!]
+2025/01/21 10:32:06 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:06 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:06 Chunk: {[{{} <nil>}]}
+2025/01/21 10:32:06 Result: 
+2025/01/21 10:32:06 Line-with-prefix: 
+
+2025/01/21 10:32:06 Line: 
+2025/01/21 10:32:06 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:06 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:06 Chunk: {[{{Hello} <nil>}]}
+2025/01/21 10:32:06 Result: Hello
+2025/01/21 10:32:06 Line-with-prefix: 
+
+2025/01/21 10:32:06 Line: 
+2025/01/21 10:32:06 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:06 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:06 Chunk: {[{{!} <nil>}]}
+2025/01/21 10:32:06 Received chunk: Hello
+2025/01/21 10:32:06 Received chunk: !
+2025/01/21 10:32:06 Result: !
+2025/01/21 10:32:06 Line-with-prefix: 
+
+2025/01/21 10:32:06 Line: 
+2025/01/21 10:32:06 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" How"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:06 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" How"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:06 Chunk: {[{{ How} <nil>}]}
+2025/01/21 10:32:06 Result:  How
+2025/01/21 10:32:06 Line-with-prefix: 
+
+2025/01/21 10:32:06 Line: 
+2025/01/21 10:32:06 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" can"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:06 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" can"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:06 Chunk: {[{{ can} <nil>}]}
+2025/01/21 10:32:06 Received chunk:  How
+2025/01/21 10:32:06 Received chunk:  can
+2025/01/21 10:32:06 Result:  can
+2025/01/21 10:32:06 Line-with-prefix: 
+
+2025/01/21 10:32:06 Line: 
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" I"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" I"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:07 Chunk: {[{{ I} <nil>}]}
+2025/01/21 10:32:07 Result:  I
+2025/01/21 10:32:07 Line-with-prefix: 
+
+2025/01/21 10:32:07 Line: 
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" assist"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" assist"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:07 Chunk: {[{{ assist} <nil>}]}
+2025/01/21 10:32:07 Received chunk:  I
+2025/01/21 10:32:07 Received chunk:  assist
+2025/01/21 10:32:07 Result:  assist
+2025/01/21 10:32:07 Line-with-prefix: 
+
+2025/01/21 10:32:07 Line: 
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:07 Chunk: {[{{ you} <nil>}]}
+2025/01/21 10:32:07 Result:  you
+2025/01/21 10:32:07 Line-with-prefix: 
+
+2025/01/21 10:32:07 Line: 
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" today"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":" today"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:07 Chunk: {[{{ today} <nil>}]}
+2025/01/21 10:32:07 Received chunk:  you
+2025/01/21 10:32:07 Received chunk:  today
+2025/01/21 10:32:07 Result:  today
+2025/01/21 10:32:07 Line-with-prefix: 
+
+2025/01/21 10:32:07 Line: 
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"?"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{"content":"?"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:07 Chunk: {[{{?} <nil>}]}
+2025/01/21 10:32:07 Result: ?
+2025/01/21 10:32:07 Line-with-prefix: 
+
+2025/01/21 10:32:07 Line: 
+2025/01/21 10:32:07 Received chunk: ?
+2025/01/21 10:32:07 Line-with-prefix: data: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+
+2025/01/21 10:32:07 Line: {"id":"chatcmpl-As4vgtcrTMT8z48SrKX95P538KtG4","object":"chat.completion.chunk","created":1737452024,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_4691090a87","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+2025/01/21 10:32:07 Chunk: {[{{} 0xc000419a20}]}
+2025/01/21 10:32:07 Stream completed
+2025/01/21 10:32:07 Error: <nil>
+2025/01/21 10:32:07 Error: <nil>
+2025/01/21 10:32:07 Error: <nil>
+2025/01/21 10:32:07 Error: <nil>
+2025/01/21 10:32:07 Received chunk: 
+2025/01/21 10:32:07 Stream completed
+2025/01/21 10:32:50 Streaming to OpenAI
+2025/01/21 10:32:50 Sending messages to OpenAI: [hi! Hello! How can I assist you today? I am just testing out a new chat app used for talking to you. It looks like it's coming through!]
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"role":"assistant","content":"","refusal":null},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{} <nil>}]}
+2025/01/21 10:32:51 Result: 
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"Great"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"Great"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{Great} <nil>}]}
+2025/01/21 10:32:51 Result: Great
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" to"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" to"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Received chunk: Great
+2025/01/21 10:32:51 Chunk: {[{{ to} <nil>}]}
+2025/01/21 10:32:51 Result:  to
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Received chunk:  to
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" hear"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" hear"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ hear} <nil>}]}
+2025/01/21 10:32:51 Result:  hear
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" that"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" that"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ that} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  hear
+2025/01/21 10:32:51 Received chunk:  that
+2025/01/21 10:32:51 Result:  that
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" it's"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" it's"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ it's} <nil>}]}
+2025/01/21 10:32:51 Result:  it's
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" working"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" working"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ working} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  it's
+2025/01/21 10:32:51 Received chunk:  working
+2025/01/21 10:32:51 Result:  working
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{!} <nil>}]}
+2025/01/21 10:32:51 Result: !
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" If"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" If"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ If} <nil>}]}
+2025/01/21 10:32:51 Received chunk: !
+2025/01/21 10:32:51 Received chunk:  If
+2025/01/21 10:32:51 Result:  If
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" you"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ you} <nil>}]}
+2025/01/21 10:32:51 Result:  you
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" have"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" have"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ have} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  you
+2025/01/21 10:32:51 Received chunk:  have
+2025/01/21 10:32:51 Result:  have
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" any"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" any"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ any} <nil>}]}
+2025/01/21 10:32:51 Result:  any
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" questions"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" questions"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Received chunk:  any
+2025/01/21 10:32:51 Chunk: {[{{ questions} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  questions
+2025/01/21 10:32:51 Result:  questions
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" or"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" or"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ or} <nil>}]}
+2025/01/21 10:32:51 Result:  or
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" need"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" need"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ need} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  or
+2025/01/21 10:32:51 Received chunk:  need
+2025/01/21 10:32:51 Result:  need
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" assistance"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" assistance"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ assistance} <nil>}]}
+2025/01/21 10:32:51 Result:  assistance
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" with"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" with"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ with} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  assistance
+2025/01/21 10:32:51 Received chunk:  with
+2025/01/21 10:32:51 Result:  with
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" anything"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" anything"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ anything} <nil>}]}
+2025/01/21 10:32:51 Result:  anything
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":","},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":","},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{,} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  anything
+2025/01/21 10:32:51 Received chunk: ,
+2025/01/21 10:32:51 Result: ,
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" feel"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" feel"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ feel} <nil>}]}
+2025/01/21 10:32:51 Result:  feel
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" free"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" free"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ free} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  feel
+2025/01/21 10:32:51 Received chunk:  free
+2025/01/21 10:32:51 Result:  free
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" to"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" to"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ to} <nil>}]}
+2025/01/21 10:32:51 Result:  to
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" let"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" let"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ let} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  to
+2025/01/21 10:32:51 Received chunk:  let
+2025/01/21 10:32:51 Result:  let
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" me"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" me"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ me} <nil>}]}
+2025/01/21 10:32:51 Result:  me
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" know"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" know"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ know} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  me
+2025/01/21 10:32:51 Received chunk:  know
+2025/01/21 10:32:51 Result:  know
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"."},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"."},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{.} <nil>}]}
+2025/01/21 10:32:51 Result: .
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" Enjoy"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" Enjoy"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ Enjoy} <nil>}]}
+2025/01/21 10:32:51 Received chunk: .
+2025/01/21 10:32:51 Received chunk:  Enjoy
+2025/01/21 10:32:51 Result:  Enjoy
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" exploring"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" exploring"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ exploring} <nil>}]}
+2025/01/21 10:32:51 Result:  exploring
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" the"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" the"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ the} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  exploring
+2025/01/21 10:32:51 Received chunk:  the
+2025/01/21 10:32:51 Result:  the
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" app"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":" app"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{ app} <nil>}]}
+2025/01/21 10:32:51 Result:  app
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{"content":"!"},"logprobs":null,"finish_reason":null}]}
+2025/01/21 10:32:51 Chunk: {[{{!} <nil>}]}
+2025/01/21 10:32:51 Received chunk:  app
+2025/01/21 10:32:51 Received chunk: !
+2025/01/21 10:32:51 Result: !
+2025/01/21 10:32:51 Line-with-prefix: 
+
+2025/01/21 10:32:51 Line: 
+2025/01/21 10:32:51 Line-with-prefix: data: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+
+2025/01/21 10:32:51 Line: {"id":"chatcmpl-As4wOw9P0IXhc7OXpUI0wItPjigcH","object":"chat.completion.chunk","created":1737452068,"model":"gpt-4o-2024-08-06","service_tier":"default","system_fingerprint":"fp_50cad350e4","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+2025/01/21 10:32:51 Chunk: {[{{} 0xc00069a070}]}
+2025/01/21 10:32:51 Stream completed
+2025/01/21 10:32:51 Received chunk: 
+2025/01/21 10:32:51 Stream completed
+2025/01/21 11:00:26 Error: <nil>
+2025/01/21 11:00:26 Error: <nil>
+2025/01/21 11:00:26 Error: <nil>
+2025/01/21 13:52:31 Error: <nil>
+2025/01/21 13:52:50 Error: <nil>
+2025/01/21 13:52:50 Error: <nil>
+2025/01/21 13:53:00 Error: <nil>
+2025/01/21 13:53:00 Error: <nil>
+2025/01/21 13:53:00 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 13:53:32 Error: <nil>
+2025/01/21 17:02:50 exec: "fzf-tmux -h": executable file not found in $PATH
+2025/01/21 17:03:48 exec: "bash -c 'fzf-tmux -h'": executable file not found in $PATH
+2025/01/21 17:05:12 exit status 130
+2025/01/21 17:14:35 Output: /home/perfr/workspace/go-coder
+2025/01/21 17:14:39 Output: /home/perfr/workspace/go-coder
+2025/01/21 17:14:39 Output: /home/perfr/workspace/go-coder
+2025/01/21 17:14:40 Output: /home/perfr/workspace/go-coder
+2025/01/22 09:38:35 exit status 1
+2025/01/22 10:24:56 exit status 1
+2025/01/22 10:26:52 Output1: find: ‘*’: No such file or directory
+2025/01/22 10:26:52 exit status 1
+2025/01/22 10:27:22 Output1: ./.gitignore
+./go.mod
+./openai.go
+./.go-coder/default-session.yaml
+./.git/description
+./.git/refs/heads/claude-attempt-1
+./.git/refs/heads/chatgpt-attempt-1
+./.git/refs/heads/main
+./.git/refs/remotes/origin/main
+./.git/logs/refs/heads/claude-attempt-1
+./.git/logs/refs/heads/chatgpt-attempt-1
+./.git/logs/refs/heads/main
+./.git/logs/refs/remotes/origin/main
+./.git/logs/HEAD
+./.git/objects/52/1936193a2fb5e814e906ee75e942733423edc3
+./.git/objects/b7/68c8ed15cb4dd67e3d1f0f1390db67a003fbec
+./.git/objects/b7/1f7531849458833d7a9e3877923893382b8e37
+./.git/objects/0b/b9ff5a5f2a7d5edeb76f5eb58d6fd8b81d8733
+./.git/objects/2a/dcde167cd967b15b25db20755b6aa8a7a513c0
+./.git/objects/55/762b40d5ce24e50c4b40f102ea8c91caa37373
+./.git/objects/18/b4958af65fc9d7eed227de0072b1c1af29c52a
+./.git/objects/18/d4718b791d0c99b0cf8232c28648ceed252c50
+./.git/objects/b5/a8fb4cc8f2a43ee0e0308262b60b9e0c2d25a7
+./.git/objects/7d/a34c5d260b150bc536991ca89406cfd4ba38ba
+./.git/objects/78/dd5cd292737375ae6b5baadb639774c954347b
+./.git/objects/78/4020aca3e840576ee025a7c757b5319b1144e3
+./.git/objects/98/79ffae21997768a8c24921a890340a74b1e37b
+./.git/objects/98/37dae7e9a3879f03799e09e4d73d43b7175192
+./.git/objects/95/cd630bf84ea117865c39c739b9d2171234f170
+./.git/objects/3c/601da3601ecf1121f9fd8ab6f14aaa9ea61749
+./.git/objects/3c/4c850112a9f766d3f0b18ff95f9d65ae3dd4c5
+./.git/objects/36/3d933865938b00ed8a4f4d6280d2f47f84e747
+./.git/objects/ef/88961239561e314fecddc3e12bc1e4cd382ed8
+./.git/objects/0c/c863b2f19dd55d0143111e42c313856758e864
+./.git/objects/d0/d9e443637f19523cfb9f40b3d88f33f68fc322
+./.git/objects/05/5e570c789d9e1c25d239c41d0751c98d4b35d7
+./.git/objects/b8/0bff1d4e5625bcff5674f9f6a70d8b1f1449de
+./.git/objects/08/59320af73f4838b51b295e1a3f17142276302b
+./.git/objects/1c/61f702e610ad8fca50e94f39a6b715f5a498fd
+./.git/objects/c3/92fd5e6505b1e97d353fd4685af2b49928c0fb
+./.git/objects/c3/7170ff1d8eff0af6045ffd32039411c80249fc
+./.git/objects/4f/02f221324aadedb31cb27a879777d0e9f3b1bd
+./.git/objects/2e/b7743e383a901673723602f2c2297b04d304f5
+./.git/objects/be/4a28ee4537efb5227255d8bf08e06a5d61d17c
+./.git/objects/89/0ff569539bf4a3c02ced310dd81c3263ebf8f6
+./.git/objects/c5/3cf77c2a9a014f8d3a68e9af2e5276b491320e
+./.git/objects/c5/88aaa814b6380d7419cd8ec637f7b367535a45
+./.git/objects/df/756c8ec72b31d6b9492c8af131d782b4dd84b1
+./.git/objects/e0/0cb3463705c226e031ca18ec9c67daae66b7c3
+./.git/objects/75/bbcd27daec8214abdf5af70a60a45190ebee26
+./.git/objects/d2/844e6334ed4ed6e160cf6115ef03a0a4c3ab56
+./.git/objects/62/230c0a755b698161b3cf60f806e96515a5b207
+./.git/objects/af/74ef7ff8c5d5b64a301b5c38ae2a9e4fc29465
+./.git/objects/84/d7ced896b9cc910472f2a866439c800aadeff8
+./.git/objects/fc/4483e008d3b49cf9dcc77da65e5778103c4af3
+./.git/objects/a3/e821d167869ad89f09088f433df396ee6c1484
+./.git/objects/a3/c037dd9d8dd7c309786337ced51b2081755e7b
+./.git/objects/b0/c246122bf4f78990c7add0e378dc8f45d0fae3
+./.git/objects/90/993e3df151227c3078e01ad2fe6d8335f98fbc
+./.git/objects/8a/a47bd5c21f7e80167fa97cad2adef43116e3be
+./.git/objects/97/f2babded08a7a6c8573170611b40b280c5abe8
+./.git/objects/23/ab29ccef28acb4dfcb85af7b49d3ad7c7d9c36
+./.git/objects/3b/36dd7ebacafb3f8595d016ffa27cfddcc442c4
+./.git/objects/93/10e8280ab5a46bbe28ed041054d32cb26546f5
+./.git/objects/bc/3ec439016878c3c3fe86c6cefa850e5ea90711
+./.git/objects/82/98b47ecd1f1c53c1cf62626fdb47e8cd2b6de5
+./.git/objects/03/aa0c6d3015f8d254ca2ef23f596295ad35a5bd
+./.git/objects/83/fb292b51d08fe104cebff345e206b9eac8805b
+./.git/objects/07/7e6bf2ceaca51e9e92a307e7bd32c2f17f27b7
+./.git/objects/6b/eedac956af551d05c0cfdec7d8342419dff750
+./.git/objects/60/4ab95671f31afd27a2c4522f92e03cb8b16d65
+./.git/objects/60/4d72e0529ccd63d16faf364d1bef95b8409ae2
+./.git/objects/24/d2c0675274e0e6ebdce342c0c8807da89b4691
+./.git/objects/fb/dcd14f80e36b640b7edccdafa6dffa4e870584
+./.git/objects/8d/70d9dac31c9769b41ebdb578f7b4801f8ca778
+./.git/objects/d8/d01d7371ac10514aa38d1260940d86dfa0debf
+./.git/objects/d8/35a065516e198d79106db7d68a6bc336f7c13e
+./.git/objects/ad/d4d0d90d4a58cbce2ff02e4665d1d0118d5eff
+./.git/objects/3a/4743445b4c7d280debb63c520abedf63bef17c
+./.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+./.git/objects/e8/50c4cd0f2e779e6f13f1153c6d8724702cb48c
+./.git/objects/21/808e434cffcb6f1492a890dc29d204c6900140
+./.git/objects/4a/d34f7ce6d4a8683fa1c9eb23dc7ff211357720
+./.git/objects/70/63fa2594af4f32f504a01832584645428d3ae0
+./.git/objects/09/18b426dc8a510c91fbbd30a27fe80b4e9d82d9
+./.git/objects/10/0b22f703259b307403d387b346daead7c215e6
+./.git/objects/10/08c2534811988049ef3174d88c025967aa6500
+./.git/objects/8e/38e6a3a169eb32b99117aae9ee347b52295d07
+./.git/objects/f2/d26c5b3cfe71ac2e891101119c00cad12fb488
+./.git/objects/44/ad42efc2b69db217d721e0af9a8ce8f78f311e
+./.git/objects/43/91c16910417be9f705178b2432a0266ddab9ea
+./.git/objects/8f/9f99e8a27198b2fab0177c233df49320ef2338
+./.git/objects/02/6ba9be0ea2d7ee77751663035d4c1687f6a803
+./.git/index
+./.git/config
+./.git/ORIG_HEAD
+./.git/FETCH_HEAD
+./.git/HEAD
+./.git/hooks/pre-merge-commit.sample
+./.git/hooks/pre-commit.sample
+./.git/hooks/fsmonitor-watchman.sample
+./.git/hooks/pre-rebase.sample
+./.git/hooks/prepare-commit-msg.sample
+./.git/hooks/pre-receive.sample
+./.git/hooks/applypatch-msg.sample
+./.git/hooks/pre-applypatch.sample
+./.git/hooks/post-update.sample
+./.git/hooks/commit-msg.sample
+./.git/hooks/update.sample
+./.git/hooks/push-to-checkout.sample
+./.git/hooks/pre-push.sample
+./.git/COMMIT_EDITMSG
+./.git/info/exclude
+./go-coder.log
+./main.go
+./LICENSE
+./go.sum
+./README.md
+./storage.go
+2025/01/22 10:27:22 Output: ./.gitignore
+./go.mod
+./openai.go
+./.go-coder/default-session.yaml
+./.git/description
+./.git/refs/heads/claude-attempt-1
+./.git/refs/heads/chatgpt-attempt-1
+./.git/refs/heads/main
+./.git/refs/remotes/origin/main
+./.git/logs/refs/heads/claude-attempt-1
+./.git/logs/refs/heads/chatgpt-attempt-1
+./.git/logs/refs/heads/main
+./.git/logs/refs/remotes/origin/main
+./.git/logs/HEAD
+./.git/objects/52/1936193a2fb5e814e906ee75e942733423edc3
+./.git/objects/b7/68c8ed15cb4dd67e3d1f0f1390db67a003fbec
+./.git/objects/b7/1f7531849458833d7a9e3877923893382b8e37
+./.git/objects/0b/b9ff5a5f2a7d5edeb76f5eb58d6fd8b81d8733
+./.git/objects/2a/dcde167cd967b15b25db20755b6aa8a7a513c0
+./.git/objects/55/762b40d5ce24e50c4b40f102ea8c91caa37373
+./.git/objects/18/b4958af65fc9d7eed227de0072b1c1af29c52a
+./.git/objects/18/d4718b791d0c99b0cf8232c28648ceed252c50
+./.git/objects/b5/a8fb4cc8f2a43ee0e0308262b60b9e0c2d25a7
+./.git/objects/7d/a34c5d260b150bc536991ca89406cfd4ba38ba
+./.git/objects/78/dd5cd292737375ae6b5baadb639774c954347b
+./.git/objects/78/4020aca3e840576ee025a7c757b5319b1144e3
+./.git/objects/98/79ffae21997768a8c24921a890340a74b1e37b
+./.git/objects/98/37dae7e9a3879f03799e09e4d73d43b7175192
+./.git/objects/95/cd630bf84ea117865c39c739b9d2171234f170
+./.git/objects/3c/601da3601ecf1121f9fd8ab6f14aaa9ea61749
+./.git/objects/3c/4c850112a9f766d3f0b18ff95f9d65ae3dd4c5
+./.git/objects/36/3d933865938b00ed8a4f4d6280d2f47f84e747
+./.git/objects/ef/88961239561e314fecddc3e12bc1e4cd382ed8
+./.git/objects/0c/c863b2f19dd55d0143111e42c313856758e864
+./.git/objects/d0/d9e443637f19523cfb9f40b3d88f33f68fc322
+./.git/objects/05/5e570c789d9e1c25d239c41d0751c98d4b35d7
+./.git/objects/b8/0bff1d4e5625bcff5674f9f6a70d8b1f1449de
+./.git/objects/08/59320af73f4838b51b295e1a3f17142276302b
+./.git/objects/1c/61f702e610ad8fca50e94f39a6b715f5a498fd
+./.git/objects/c3/92fd5e6505b1e97d353fd4685af2b49928c0fb
+./.git/objects/c3/7170ff1d8eff0af6045ffd32039411c80249fc
+./.git/objects/4f/02f221324aadedb31cb27a879777d0e9f3b1bd
+./.git/objects/2e/b7743e383a901673723602f2c2297b04d304f5
+./.git/objects/be/4a28ee4537efb5227255d8bf08e06a5d61d17c
+./.git/objects/89/0ff569539bf4a3c02ced310dd81c3263ebf8f6
+./.git/objects/c5/3cf77c2a9a014f8d3a68e9af2e5276b491320e
+./.git/objects/c5/88aaa814b6380d7419cd8ec637f7b367535a45
+./.git/objects/df/756c8ec72b31d6b9492c8af131d782b4dd84b1
+./.git/objects/e0/0cb3463705c226e031ca18ec9c67daae66b7c3
+./.git/objects/75/bbcd27daec8214abdf5af70a60a45190ebee26
+./.git/objects/d2/844e6334ed4ed6e160cf6115ef03a0a4c3ab56
+./.git/objects/62/230c0a755b698161b3cf60f806e96515a5b207
+./.git/objects/af/74ef7ff8c5d5b64a301b5c38ae2a9e4fc29465
+./.git/objects/84/d7ced896b9cc910472f2a866439c800aadeff8
+./.git/objects/fc/4483e008d3b49cf9dcc77da65e5778103c4af3
+./.git/objects/a3/e821d167869ad89f09088f433df396ee6c1484
+./.git/objects/a3/c037dd9d8dd7c309786337ced51b2081755e7b
+./.git/objects/b0/c246122bf4f78990c7add0e378dc8f45d0fae3
+./.git/objects/90/993e3df151227c3078e01ad2fe6d8335f98fbc
+./.git/objects/8a/a47bd5c21f7e80167fa97cad2adef43116e3be
+./.git/objects/97/f2babded08a7a6c8573170611b40b280c5abe8
+./.git/objects/23/ab29ccef28acb4dfcb85af7b49d3ad7c7d9c36
+./.git/objects/3b/36dd7ebacafb3f8595d016ffa27cfddcc442c4
+./.git/objects/93/10e8280ab5a46bbe28ed041054d32cb26546f5
+./.git/objects/bc/3ec439016878c3c3fe86c6cefa850e5ea90711
+./.git/objects/82/98b47ecd1f1c53c1cf62626fdb47e8cd2b6de5
+./.git/objects/03/aa0c6d3015f8d254ca2ef23f596295ad35a5bd
+./.git/objects/83/fb292b51d08fe104cebff345e206b9eac8805b
+./.git/objects/07/7e6bf2ceaca51e9e92a307e7bd32c2f17f27b7
+./.git/objects/6b/eedac956af551d05c0cfdec7d8342419dff750
+./.git/objects/60/4ab95671f31afd27a2c4522f92e03cb8b16d65
+./.git/objects/60/4d72e0529ccd63d16faf364d1bef95b8409ae2
+./.git/objects/24/d2c0675274e0e6ebdce342c0c8807da89b4691
+./.git/objects/fb/dcd14f80e36b640b7edccdafa6dffa4e870584
+./.git/objects/8d/70d9dac31c9769b41ebdb578f7b4801f8ca778
+./.git/objects/d8/d01d7371ac10514aa38d1260940d86dfa0debf
+./.git/objects/d8/35a065516e198d79106db7d68a6bc336f7c13e
+./.git/objects/ad/d4d0d90d4a58cbce2ff02e4665d1d0118d5eff
+./.git/objects/3a/4743445b4c7d280debb63c520abedf63bef17c
+./.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+./.git/objects/e8/50c4cd0f2e779e6f13f1153c6d8724702cb48c
+./.git/objects/21/808e434cffcb6f1492a890dc29d204c6900140
+./.git/objects/4a/d34f7ce6d4a8683fa1c9eb23dc7ff211357720
+./.git/objects/70/63fa2594af4f32f504a01832584645428d3ae0
+./.git/objects/09/18b426dc8a510c91fbbd30a27fe80b4e9d82d9
+./.git/objects/10/0b22f703259b307403d387b346daead7c215e6
+./.git/objects/10/08c2534811988049ef3174d88c025967aa6500
+./.git/objects/8e/38e6a3a169eb32b99117aae9ee347b52295d07
+./.git/objects/f2/d26c5b3cfe71ac2e891101119c00cad12fb488
+./.git/objects/44/ad42efc2b69db217d721e0af9a8ce8f78f311e
+./.git/objects/43/91c16910417be9f705178b2432a0266ddab9ea
+./.git/objects/8f/9f99e8a27198b2fab0177c233df49320ef2338
+./.git/objects/02/6ba9be0ea2d7ee77751663035d4c1687f6a803
+./.git/index
+./.git/config
+./.git/ORIG_HEAD
+./.git/FETCH_HEAD
+./.git/HEAD
+./.git/hooks/pre-merge-commit.sample
+./.git/hooks/pre-commit.sample
+./.git/hooks/fsmonitor-watchman.sample
+./.git/hooks/pre-rebase.sample
+./.git/hooks/prepare-commit-msg.sample
+./.git/hooks/pre-receive.sample
+./.git/hooks/applypatch-msg.sample
+./.git/hooks/pre-applypatch.sample
+./.git/hooks/post-update.sample
+./.git/hooks/commit-msg.sample
+./.git/hooks/update.sample
+./.git/hooks/push-to-checkout.sample
+./.git/hooks/pre-push.sample
+./.git/COMMIT_EDITMSG
+./.git/info/exclude
+./go-coder.log
+./main.go
+./LICENSE
+./go.sum
+./README.md
+./storage.go
+2025/01/22 10:37:25 Output1: find: paths must precede expression: `|'
+2025/01/22 10:37:25 exit status 1
+2025/01/22 10:45:41 Output1: ./go.mod
+2025/01/22 10:45:41 Output: ./go.mod
+2025/01/22 10:46:05 Error: <nil>
+2025/01/22 10:46:14 Output1: ./main.go
+2025/01/22 10:46:14 Output: ./main.go
+2025/01/22 10:51:27 Error: <nil>
+2025/01/22 10:53:27 Output1: 
+2025/01/22 10:53:27 exit status 1
+2025/01/22 10:56:24 Output1: 
+2025/01/22 10:56:24 exit status 1
+2025/01/22 10:56:24 Output: 
+2025/01/22 14:51:38 Output1: ./go.mod
+2025/01/22 14:51:38 Output: ./go.mod
+2025/01/22 15:26:36 Output1: ./go.mod
+2025/01/22 15:26:36 Output: ./go.mod
+2025/01/22 15:26:37 Error sending request: Post "https://api.openai.com/v1/chat/completions": dial tcp: lookup api.openai.com on 10.255.255.254:53: read udp 10.255.255.254:53066->10.255.255.254:53: i/o timeout
+2025/01/22 15:26:37 Error: Post "https://api.openai.com/v1/chat/completions": dial tcp: lookup api.openai.com on 10.255.255.254:53: read udp 10.255.255.254:53066->10.255.255.254:53: i/o timeout
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:01 Error: <nil>
+2025/01/22 15:28:18 Error: <nil>
+2025/01/22 15:28:18 Error: <nil>
+2025/01/22 15:28:18 Error: <nil>
+2025/01/22 15:32:00 Error: <nil>
+2025/01/22 15:32:00 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:17 Error: <nil>
+2025/01/22 16:32:36 Output1: ./go.mod
+2025/01/22 16:32:36 Output: ./go.mod
+2025/01/22 19:31:01 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/22 19:31:25 Error: <nil>
+2025/01/22 19:31:39 Error: <nil>
+2025/01/22 19:31:39 Error: <nil>
+2025/01/23 15:25:10 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/23 20:58:58 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/23 20:59:10 Error: <nil>
+2025/01/23 20:59:10 Error: <nil>
+2025/01/23 22:34:54 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/23 22:38:43 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/23 23:49:51 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/23 23:53:27 WorkingFiles []
+2025/01/23 23:54:46 WorkingFiles []
+2025/01/23 23:54:56 WorkingFiles [{./storage.go <nil>} {./openai.go <nil>} {./main.go <nil>}]
+2025/01/24 00:22:16 WorkingFiles [{./storage.go <nil>} {./openai.go <nil>} {./main.go <nil>}]
+2025/01/24 00:22:21 exit status 130
+2025/01/24 15:12:57 Error: <nil>
+2025/01/24 15:13:03 Error: <nil>
+2025/01/24 15:13:03 Error: <nil>
+2025/01/26 16:52:16 exit status 130
+2025/01/26 16:54:37 Preparing user message
+2025/01/26 18:25:11 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 18:25:11 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+workingfiles: []
+
+2025/01/26 18:25:11 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[]}
+2025/01/26 19:12:56 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:12:56 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+workingfiles:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:12:56 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[{Path:./openai.go LastSubmittedChecksum:<nil> FileContent:[]} {Path:./main.go LastSubmittedChecksum:<nil> FileContent:[]}]}
+2025/01/26 19:13:15 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:13:15 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+workingfiles:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:13:15 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[{Path:./openai.go LastSubmittedChecksum:<nil> FileContent:[]} {Path:./main.go LastSubmittedChecksum:<nil> FileContent:[]}]}
+2025/01/26 19:13:25 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:13:25 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+working_files:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:13:25 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[]}
+2025/01/26 19:13:33 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:13:33 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+workingfiles:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:13:33 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[{Path:./openai.go LastSubmittedChecksum:<nil> FileContent:[]} {Path:./main.go LastSubmittedChecksum:<nil> FileContent:[]}]}
+2025/01/26 19:14:42 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:14:42 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+working_files:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:14:42 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[]}
+2025/01/26 19:14:59 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 19:14:59 Session file content: messages:
+- role: user
+  content: Hi! Just testing!
+- role: system
+  content: Hello! It looks like everything is working fine. If you have any questions
+    or need assistance with something, feel free to ask!
+- role: user
+  content: Test again!
+- role: system
+  content: Everything still seems to be working perfectly! If there's anything specific
+    you'd like to know or test further, just let me know.
+workingfiles:
+- path: ./openai.go
+  last_submitted_checksum: null
+  file_content: []
+- path: ./main.go
+  last_submitted_checksum: null
+  filecontent: []
+
+2025/01/26 19:14:59 Working session loaded: {Messages:[{Role:user Content:Hi! Just testing!} {Role:system Content:Hello! It looks like everything is working fine. If you have any questions or need assistance with something, feel free to ask!} {Role:user Content:Test again!} {Role:system Content:Everything still seems to be working perfectly! If there's anything specific you'd like to know or test further, just let me know.}] WorkingFiles:[{Path:./openai.go LastSubmittedChecksum:<nil> FileContent:[]} {Path:./main.go LastSubmittedChecksum:<nil> FileContent:[]}]}
+2025/01/26 20:05:47 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:05:47 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:05:54 Error: <nil>
+2025/01/26 20:07:05 Error: <nil>
+2025/01/26 20:07:05 Error: <nil>
+2025/01/26 20:07:05 Error: <nil>
+2025/01/26 20:09:13 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:46:19 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:48:43 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:48:43 Session file not found, creating a new one at ./.go-coder/default-session.yaml
+2025/01/26 20:48:49 Error: <nil>
+2025/01/26 20:49:00 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:49:35 Loading working session from ./.go-coder/default-session.yaml
+2025/01/26 20:50:15 Error: <nil>
+2025/01/26 20:50:15 Error: <nil>
+2025/01/26 20:50:15 Error: <nil>
+2025/01/26 20:50:15 Error: <nil>
