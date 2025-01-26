@@ -1,4 +1,4 @@
-module cir
+module github.com/worldsayshi/cir
 
 go 1.22.1
 
