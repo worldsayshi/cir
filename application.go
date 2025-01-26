@@ -29,6 +29,7 @@ type WorkingFile struct {
 type WorkingSession struct {
 	Messages     []Message     `json:"messages" yaml:"messages"`
 	WorkingFiles []WorkingFile `json:"working_files" yaml:"working_files"`
+	InputText    string        `json:"input_text" yaml:"input_text"`
 }
 
 type CirApplication struct {
@@ -91,6 +92,9 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	textInputArea.
 		SetBorder(true).
 		SetTitle("Input")
+	textInputArea.
+		SetText(workingSession.InputText, true)
+
 	chatHistory.
 		SetChangedFunc(func() {
 			app.Draw()
@@ -104,6 +108,10 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		workingSession: workingSession,
 		sessionFile:    sessionFile,
 	}
+
+	textInputArea.SetChangedFunc(func() {
+		cirApp.workingSession.InputText = textInputArea.GetText()
+	})
 
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
@@ -189,6 +197,11 @@ func (app *CirApplication) Run() error {
 		SetFocus(app.textInputArea).Run(); err != nil {
 		panic(err)
 	}
+	defer func() {
+		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+			log.Println("Error saving session:", err)
+		}
+	}()
 	return nil
 }
 
