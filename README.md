@@ -36,6 +36,7 @@ Then just run `cir` to start it. It will store the session in a `./.cir` folder.
 - [X] Prompt templates for sending context
 - [ ] Make the history view scrollable
 - [ ] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
+- [ ] QOL: Also store the current wip chat message in the session
 
 # Nice to have's
 
