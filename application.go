@@ -14,10 +14,15 @@ import (
 	"github.com/rivo/tview"
 )
 
+type AiServiceMessage struct {
+	Role    string `json:"role" yaml:"role"`
+	Content string `json:"content" yaml:"content"`
+}
+
 type Message struct {
-	Role     string `json:"role" yaml:"role"`
-	Content  string `json:"content" yaml:"content"`
-	Question string `json:"question,omitempty" yaml:"question,omitempty"`
+	AiServiceMessage
+	Question             string        `json:"question,omitempty" yaml:"question,omitempty"`
+	IncludedWorkingFiles []WorkingFile `json:"included_working_files,omitempty" yaml:"included_working_files,omitempty"`
 }
 
 type WorkingFile struct {
@@ -72,14 +77,58 @@ func initChatHistory(workingSession *WorkingSession) *tview.TextView {
 	return chatHistory
 }
 
+func renderChatHistory(chatHistory *tview.TextView, messages []Message) {
+	msgsString := []string{}
+	for _, msg := range messages {
+		if msg.Role == "user" {
+			msgsString = append(msgsString, msg.Question)
+		} else {
+			msgsString = append(msgsString, msg.Content)
+		}
+	}
+	chatHistory.SetText(strings.Join(msgsString, "\n\n---\n"))
+	chatHistory.ScrollToEnd()
+}
+
 func initContextBar(workingSession *WorkingSession) *tview.TextView {
 	contextBar := tview.NewTextView()
 	contextBar.
 		SetBorder(true).
 		SetTitle("Context")
-	//contextBar := newPrimitive("Context").(*tview.TextView)
-	renderContextFiles(contextBar, workingSession.WorkingFiles)
+	renderContextBar(contextBar, workingSession.WorkingFiles)
 	return contextBar
+}
+
+func renderContextBar(contextBar *tview.TextView, wf []WorkingFile) {
+	s := []string{}
+	for _, f := range wf {
+		s = append(s, f.Path)
+	}
+	contextBar.SetText(strings.Join(s, " | "))
+}
+
+func (app *CirApplication) editContextFiles() {
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
+	out, err := exec.Command(
+		"bash", "-c", cmd,
+	).CombinedOutput()
+	if err != nil {
+		log.Println(err)
+	}
+
+	contextFiles := strings.Split(string(out), "\n")
+	// filter out empty strings
+	filteredWorkingFiles := []WorkingFile{}
+	for _, f := range contextFiles {
+		if f != "" {
+			filteredWorkingFiles = append(filteredWorkingFiles, WorkingFile{Path: f})
+		}
+	}
+	app.workingSession.WorkingFiles = filteredWorkingFiles
+	if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+		panic(err)
+	}
+	renderContextBar(app.contextBar, app.workingSession.WorkingFiles)
 }
 
 func initTextInputArea(workingSession *WorkingSession) *tview.TextArea {
@@ -159,51 +208,6 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	return cirApp
 }
 
-func renderChatHistory(chatHistory *tview.TextView, messages []Message) {
-	msgsString := []string{}
-	for _, msg := range messages {
-		if msg.Role == "user" {
-			msgsString = append(msgsString, msg.Question)
-		} else {
-			msgsString = append(msgsString, msg.Content)
-		}
-	}
-	chatHistory.SetText(strings.Join(msgsString, "\n\n---\n"))
-	chatHistory.ScrollToEnd()
-}
-
-func renderContextFiles(contextBar *tview.TextView, wf []WorkingFile) {
-	s := []string{}
-	for _, f := range wf {
-		s = append(s, f.Path)
-	}
-	contextBar.SetText(strings.Join(s, " | "))
-}
-
-func (app *CirApplication) editContextFiles() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
-	out, err := exec.Command(
-		"bash", "-c", cmd,
-	).CombinedOutput()
-	if err != nil {
-		log.Println(err)
-	}
-
-	contextFiles := strings.Split(string(out), "\n")
-	// filter out empty strings
-	filteredWorkingFiles := []WorkingFile{}
-	for _, f := range contextFiles {
-		if f != "" {
-			filteredWorkingFiles = append(filteredWorkingFiles, WorkingFile{Path: f})
-		}
-	}
-	app.workingSession.WorkingFiles = filteredWorkingFiles
-	if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
-		panic(err)
-	}
-	renderContextFiles(app.contextBar, app.workingSession.WorkingFiles)
-}
-
 func (app *CirApplication) Run() error {
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(app.chatHistory, 0, 5, false).
@@ -257,8 +261,7 @@ var promptTemplate string = `{{- range .workingFiles -}}
 </question>`
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func (app *CirApplication) prepareUserMessage(question string) string {
-	filesToSubmit := app.getFilesToSubmit()
+func prepareUserMessage(filesToSubmit []WorkingFile, question string) string {
 	var buf bytes.Buffer
 	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
 	templ.Execute(&buf, map[string]interface{}{
@@ -268,11 +271,30 @@ func (app *CirApplication) prepareUserMessage(question string) string {
 	return buf.String()
 }
 
+// Update the checksums of the files that were submitted
+func (app *CirApplication) updateWorkingFileChecksums(filesToSubmit []WorkingFile) {
+	for i, wf := range app.workingSession.WorkingFiles {
+		for _, wfSubmit := range filesToSubmit {
+			if wf.Path == wfSubmit.Path {
+				app.workingSession.WorkingFiles[i] = wfSubmit
+			}
+		}
+	}
+}
+
 func (app *CirApplication) handleChatSubmit() {
 	text := app.textInputArea.GetText()
 	if text != "" {
-		content := app.prepareUserMessage(text)
-		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: content, Question: text})
+		filesToSubmit := app.getFilesToSubmit()
+		content := prepareUserMessage(filesToSubmit, text)
+		app.workingSession.Messages = append(
+			app.workingSession.Messages,
+			Message{
+				AiServiceMessage:     AiServiceMessage{Role: "user", Content: content},
+				Question:             text,
+				IncludedWorkingFiles: filesToSubmit,
+			})
+		app.updateWorkingFileChecksums(filesToSubmit)
 		renderChatHistory(app.chatHistory, app.workingSession.Messages)
 		app.textInputArea.SetText("", true)
 		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
@@ -283,11 +305,23 @@ func (app *CirApplication) handleChatSubmit() {
 		app.textInputArea.SetDisabled(true)
 
 		// Add empty message for streaming response
-		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "system", Content: ""})
+		app.workingSession.Messages = append(
+			app.workingSession.Messages,
+			Message{
+				AiServiceMessage:     AiServiceMessage{Role: "system", Content: ""},
+				Question:             "",
+				IncludedWorkingFiles: []WorkingFile{},
+			},
+		)
 		lastIdx := len(app.workingSession.Messages) - 1
 
+		serviceMessages := []AiServiceMessage{}
+		for _, msg := range app.workingSession.Messages[:lastIdx] {
+			serviceMessages = append(serviceMessages, msg.AiServiceMessage)
+		}
+
 		// Start streaming
-		resultChan, errChan := streamOpenAI(app.workingSession.Messages[:lastIdx])
+		resultChan, errChan := streamOpenAI(serviceMessages)
 
 		// Create a goroutine to handle streaming updates
 		go app.handleStreamResponse(resultChan, errChan)
@@ -309,7 +343,7 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 				return
 			}
 			accumulated += chunk
-			app.workingSession.Messages[lastIdx].Content = accumulated
+			app.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
 			renderChatHistory(app.chatHistory, app.workingSession.Messages)
 		case err := <-errChan:
 			log.Printf("Error: %v", err)

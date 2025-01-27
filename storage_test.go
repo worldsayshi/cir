@@ -14,8 +14,8 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 	// Prepare a session to save
 	session := &WorkingSession{
 		Messages: []Message{
-			{Role: "user", Content: "Hello"},
-			{Role: "system", Content: "Hi there!"},
+			{AiServiceMessage{Role: "user", Content: "Hello"}, "Hello", nil},
+			{AiServiceMessage{Role: "system", Content: "Hi there!"}, "Hi there!", nil},
 		},
 		WorkingFiles: []WorkingFile{
 			{Path: "file1.txt"},

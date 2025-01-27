@@ -12,12 +12,12 @@ import (
 )
 
 type OpenAIRequest struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
-	Stream   bool      `json:"stream"`
+	Model    string             `json:"model"`
+	Messages []AiServiceMessage `json:"messages"`
+	Stream   bool               `json:"stream"`
 }
 
-func streamOpenAI(messages []Message) (chan string, chan error) {
+func streamOpenAI(messages []AiServiceMessage) (chan string, chan error) {
 	resultChan := make(chan string)
 	errChan := make(chan error)
 

@@ -42,7 +42,8 @@ working_files:
 
 	// Prepare user message
 	question := "What is the content of the test file?"
-	userMessage := app.prepareUserMessage(question)
+	filesToSubmit := app.getFilesToSubmit()
+	userMessage := prepareUserMessage(filesToSubmit, question)
 
 	// Check if the user message contains the expected content
 	expectedContent := `<context file="testfile.txt">
