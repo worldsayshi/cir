@@ -63,30 +63,26 @@ func cycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 	}
 }
 
-func NewCirApplication(sessionFile string) *CirApplication {
-	app := tview.NewApplication()
-	newPrimitive := func(text string) tview.Primitive {
-		p := tview.NewTextView()
-		p.
-			SetBorder(true).
-			SetTitle(text)
-		return p
-	}
+func initChatHistory(workingSession *WorkingSession) *tview.TextView {
+	chatHistory := tview.NewTextView()
+	chatHistory.
+		SetBorder(true).
+		SetTitle("History")
+	renderChatHistory(chatHistory, workingSession.Messages)
+	return chatHistory
+}
 
-	workingSession, err := loadWorkingSession(sessionFile)
-	if err != nil {
-		panic(err)
-	}
-
-	// Chat history
-	chatHistory := newPrimitive("History").(*tview.TextView)
-	renderMessages(chatHistory, workingSession.Messages)
-
-	// Context bar
-	contextBar := newPrimitive("Context").(*tview.TextView)
+func initContextBar(workingSession *WorkingSession) *tview.TextView {
+	contextBar := tview.NewTextView()
+	contextBar.
+		SetBorder(true).
+		SetTitle("Context")
+	//contextBar := newPrimitive("Context").(*tview.TextView)
 	renderContextFiles(contextBar, workingSession.WorkingFiles)
+	return contextBar
+}
 
-	// Text input area
+func initTextInputArea(workingSession *WorkingSession) *tview.TextArea {
 	textInputArea := tview.NewTextArea().
 		SetPlaceholder("Write here")
 	textInputArea.
@@ -94,11 +90,25 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		SetTitle("Input")
 	textInputArea.
 		SetText(workingSession.InputText, true)
+	return textInputArea
+}
 
-	chatHistory.
-		SetChangedFunc(func() {
-			app.Draw()
-		})
+func NewCirApplication(sessionFile string) *CirApplication {
+	app := tview.NewApplication()
+
+	workingSession, err := loadWorkingSession(sessionFile)
+	if err != nil {
+		panic(err)
+	}
+
+	// Chat history
+	chatHistory := initChatHistory(workingSession)
+
+	// Context bar
+	contextBar := initContextBar(workingSession)
+
+	// Text input area
+	textInputArea := initTextInputArea(workingSession)
 
 	cirApp := &CirApplication{
 		app:            app,
@@ -109,10 +119,17 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		sessionFile:    sessionFile,
 	}
 
+	// Redraw chat history when it changes
+	chatHistory.SetChangedFunc(func() {
+		app.Draw()
+	})
+
+	// Update input text in working session
 	textInputArea.SetChangedFunc(func() {
 		cirApp.workingSession.InputText = textInputArea.GetText()
 	})
 
+	// Ctrl+S to submit
 	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlS {
 			cirApp.handleChatSubmit()
@@ -125,8 +142,8 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		return event
 	})
 
+	// Tab and Shift+Tab to cycle focus
 	focusableElements := []tview.Primitive{chatHistory, textInputArea}
-
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyTab:
@@ -142,7 +159,7 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	return cirApp
 }
 
-func renderMessages(chatHistory *tview.TextView, messages []Message) {
+func renderChatHistory(chatHistory *tview.TextView, messages []Message) {
 	msgsString := []string{}
 	for _, msg := range messages {
 		if msg.Role == "user" {
@@ -256,7 +273,7 @@ func (app *CirApplication) handleChatSubmit() {
 	if text != "" {
 		content := app.prepareUserMessage(text)
 		app.workingSession.Messages = append(app.workingSession.Messages, Message{Role: "user", Content: content, Question: text})
-		renderMessages(app.chatHistory, app.workingSession.Messages)
+		renderChatHistory(app.chatHistory, app.workingSession.Messages)
 		app.textInputArea.SetText("", true)
 		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 			panic(err)
@@ -293,12 +310,12 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 			}
 			accumulated += chunk
 			app.workingSession.Messages[lastIdx].Content = accumulated
-			renderMessages(app.chatHistory, app.workingSession.Messages)
+			renderChatHistory(app.chatHistory, app.workingSession.Messages)
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
 				app.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
-				renderMessages(app.chatHistory, app.workingSession.Messages)
+				renderChatHistory(app.chatHistory, app.workingSession.Messages)
 				app.textInputArea.SetDisabled(false)
 				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 					panic(err)
