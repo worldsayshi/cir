@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path"
 )
 
 func setupLogging() (f *os.File, err error) {
@@ -18,7 +19,11 @@ func setupLogging() (f *os.File, err error) {
 }
 
 func main() {
-	sessionFile := flag.String("session", "~/.cir/default-session.yaml", "path to the session file")
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	sessionFile := flag.String("session", path.Join(homedir, ".cir/default-session.yaml"), "path to the session file")
 	flag.Parse()
 
 	logfile, err := setupLogging()

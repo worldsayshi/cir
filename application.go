@@ -20,7 +20,7 @@ type AiServiceMessage struct {
 }
 
 type Message struct {
-	AiServiceMessage
+	AiServiceMessage     `json:"aiServiceMessage,omitempty" yaml:"aiServiceMessage,omitempty"`
 	Question             string        `json:"question,omitempty" yaml:"question,omitempty"`
 	IncludedWorkingFiles []WorkingFile `json:"included_working_files,omitempty" yaml:"included_working_files,omitempty"`
 }
@@ -147,7 +147,8 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	workingSession, err := loadWorkingSession(sessionFile)
 	if err != nil {
-		panic(err)
+		log.Println("Error loading session from file:", sessionFile)
+		panic(fmt.Sprintf("Error loading session from file: %v\n%v", sessionFile, err))
 	}
 
 	// Chat history

@@ -101,8 +101,9 @@ func TestLoadFromPreMadeFile(t *testing.T) {
 	// Write initial session data to the file
 	initialSessionData := `
 messages:
-  - role: "user"
-    content: "Hello"
+  - aiServiceMessage:
+        role: "user"
+        content: "Hello"
 working_files:
   - path: "testfile.txt"
     last_submitted_checksum: null
