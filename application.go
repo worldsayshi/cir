@@ -20,13 +20,13 @@ type CirApplication struct {
 	*tview.Application
 	chatHistory    *tview.TextView
 	inputArea      *components.InputArea
-	contextBar     *tview.TextView
+	contextBar     *components.ContextBar
 	workingSession *types.WorkingSession
 	sessionFile    string
 }
 
 // From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
-func cycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool) {
+func cycleFocus(cirApp *CirApplication, elements []tview.Primitive, reverse bool) {
 	for i, el := range elements {
 		if !el.HasFocus() {
 			continue
@@ -42,12 +42,12 @@ func cycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 			i = i % len(elements)
 		}
 
-		app.SetFocus(elements[i])
+		cirApp.SetFocus(elements[i])
 		return
 	}
 }
 
-func (app *CirApplication) editContextFiles() {
+func (cirApp *CirApplication) editContextFiles() {
 	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
 	out, err := exec.Command(
 		"bash", "-c", cmd,
@@ -58,22 +58,20 @@ func (app *CirApplication) editContextFiles() {
 
 	contextFiles := strings.Split(string(out), "\n")
 	// filter out empty strings
-	filteredWorkingFiles := []types.WorkingFile{}
+	selectedWorkingFiles := []types.WorkingFile{}
 	for _, f := range contextFiles {
 		if f != "" {
-			filteredWorkingFiles = append(filteredWorkingFiles, types.WorkingFile{Path: f})
+			selectedWorkingFiles = append(selectedWorkingFiles, types.WorkingFile{Path: f})
 		}
 	}
-	app.workingSession.WorkingFiles = filteredWorkingFiles
-	if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+	cirApp.workingSession.WorkingFiles = selectedWorkingFiles
+	if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 		panic(err)
 	}
-	components.RenderContextBar(app.contextBar, app.workingSession.WorkingFiles)
+	cirApp.contextBar.Render(cirApp.workingSession.WorkingFiles)
 }
 
 func NewCirApplication(sessionFile string) *CirApplication {
-	app := tview.NewApplication()
-
 	workingSession, err := loadWorkingSession(sessionFile)
 	if err != nil {
 		log.Println("Error loading session from file:", sessionFile)
@@ -84,13 +82,13 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	chatHistory := components.InitChatHistory(workingSession)
 
 	// Context bar
-	contextBar := components.InitContextBar(workingSession)
+	contextBar := components.NewContextBar(&workingSession.WorkingFiles)
 
 	// Text input area
 	inputArea := components.NewInputArea()
 
 	cirApp := &CirApplication{
-		Application:    app,
+		Application:    tview.NewApplication(),
 		chatHistory:    chatHistory,
 		inputArea:      inputArea,
 		contextBar:     contextBar,
@@ -100,7 +98,7 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	// Redraw chat history when it changes
 	chatHistory.SetChangedFunc(func() {
-		app.Draw()
+		cirApp.Draw()
 	})
 
 	inputArea.SetInputText(workingSession.InputText)
@@ -111,19 +109,19 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	})
 
 	inputArea.SetSubmitFunc(cirApp.handleChatSubmit)
-	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		return event
 	})
 
 	focusableElements := []tview.Primitive{chatHistory, inputArea}
-	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		// Tab and Shift+Tab to cycle focus
 		case tcell.KeyTab:
-			cycleFocus(app, focusableElements, false)
+			cycleFocus(cirApp, focusableElements, false)
 			return nil
 		case tcell.KeyBacktab:
-			cycleFocus(app, focusableElements, true)
+			cycleFocus(cirApp, focusableElements, true)
 			return nil
 		// Ctrl+O to edit context files
 		case tcell.KeyCtrlO:
@@ -136,18 +134,18 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	return cirApp
 }
 
-func (app *CirApplication) Run() error {
+func (cirApp *CirApplication) Run() error {
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(app.chatHistory, 0, 5, false).
-		AddItem(app.contextBar, 0, 1, false).
-		AddItem(app.inputArea, 0, 2, true)
-	if err := app.
+		AddItem(cirApp.chatHistory, 0, 5, false).
+		AddItem(cirApp.contextBar, 0, 1, false).
+		AddItem(cirApp.inputArea, 0, 2, true)
+	if err := cirApp.
 		SetRoot(flex, true).
-		SetFocus(app.inputArea).Run(); err != nil {
+		SetFocus(cirApp.inputArea).Run(); err != nil {
 		panic(err)
 	}
 	defer func() {
-		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+		if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 			log.Println("Error saving session:", err)
 		}
 	}()
@@ -155,9 +153,9 @@ func (app *CirApplication) Run() error {
 }
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func (app *CirApplication) getFilesToSubmit() []types.WorkingFile {
+func (cirApp *CirApplication) getFilesToSubmit() []types.WorkingFile {
 	filesToSubmit := []types.WorkingFile{}
-	for _, wf := range app.workingSession.WorkingFiles {
+	for _, wf := range cirApp.workingSession.WorkingFiles {
 		fileContents, err := os.ReadFile(wf.Path)
 		if err != nil {
 			log.Println("Error reading context file:", wf.Path, err)
@@ -200,50 +198,50 @@ func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) stri
 }
 
 // Update the checksums of the files that were submitted
-func (app *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.WorkingFile) {
-	for i, wf := range app.workingSession.WorkingFiles {
+func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.WorkingFile) {
+	for i, wf := range cirApp.workingSession.WorkingFiles {
 		for _, wfSubmit := range filesToSubmit {
 			if wf.Path == wfSubmit.Path {
-				app.workingSession.WorkingFiles[i] = wfSubmit
+				cirApp.workingSession.WorkingFiles[i] = wfSubmit
 			}
 		}
 	}
 }
 
-func (app *CirApplication) handleChatSubmit(text string) {
+func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
-		filesToSubmit := app.getFilesToSubmit()
+		filesToSubmit := cirApp.getFilesToSubmit()
 		content := prepareUserMessage(filesToSubmit, text)
-		app.workingSession.Messages = append(
-			app.workingSession.Messages,
+		cirApp.workingSession.Messages = append(
+			cirApp.workingSession.Messages,
 			types.Message{
 				AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
 				Question:             text,
 				IncludedWorkingFiles: filesToSubmit,
 			})
-		app.updateWorkingFileChecksums(filesToSubmit)
-		components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
-		app.inputArea.SetText("", true)
-		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+		cirApp.updateWorkingFileChecksums(filesToSubmit)
+		components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
+		cirApp.inputArea.SetText("", true)
+		if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 			panic(err)
 		}
 
 		// Lock the text input area
-		app.inputArea.SetDisabled(true)
+		cirApp.inputArea.SetDisabled(true)
 
 		// Add empty message for streaming response
-		app.workingSession.Messages = append(
-			app.workingSession.Messages,
+		cirApp.workingSession.Messages = append(
+			cirApp.workingSession.Messages,
 			types.Message{
 				AiServiceMessage:     types.AiServiceMessage{Role: "system", Content: ""},
 				Question:             "",
 				IncludedWorkingFiles: []types.WorkingFile{},
 			},
 		)
-		lastIdx := len(app.workingSession.Messages) - 1
+		lastIdx := len(cirApp.workingSession.Messages) - 1
 
 		serviceMessages := []types.AiServiceMessage{}
-		for _, msg := range app.workingSession.Messages[:lastIdx] {
+		for _, msg := range cirApp.workingSession.Messages[:lastIdx] {
 			serviceMessages = append(serviceMessages, msg.AiServiceMessage)
 		}
 
@@ -251,34 +249,34 @@ func (app *CirApplication) handleChatSubmit(text string) {
 		resultChan, errChan := streamOpenAI(serviceMessages)
 
 		// Create a goroutine to handle streaming updates
-		go app.handleStreamResponse(resultChan, errChan)
+		go cirApp.handleStreamResponse(resultChan, errChan)
 	}
 }
 
-func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan chan error) {
+func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errChan chan error) {
 	accumulated := ""
-	lastIdx := len(app.workingSession.Messages) - 1
+	lastIdx := len(cirApp.workingSession.Messages) - 1
 	for {
 		select {
 		case chunk, ok := <-resultChan:
 			if !ok {
 				// Stream completed
-				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+				if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 					panic(err)
 				}
-				app.inputArea.SetDisabled(false)
+				cirApp.inputArea.SetDisabled(false)
 				return
 			}
 			accumulated += chunk
-			app.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
-			components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
+			cirApp.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
+			components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
-				app.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
-				components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
-				app.inputArea.SetDisabled(false)
-				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
+				cirApp.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
+				components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
+				cirApp.inputArea.SetDisabled(false)
+				if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 					panic(err)
 				}
 				return
