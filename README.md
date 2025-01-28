@@ -34,6 +34,7 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
     - [X] Just add them to the message
         -
     - [X] Add them but hide them from rendering
+    - [ ] Add the file names sent to the printed chat message
     - [/] Add them to the session data, calculate and store checksum whenever they are added to the sent data, only send when checksum change
 - [X] Prompt templates for sending context
 - [X] Make the history view scrollable
@@ -41,12 +42,16 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
 
 # TODOs for Beta
 
-- [ ] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
+- [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
+    - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
 - [ ] Allow code edits
 - [ ] Bug: Getting `Error: <nil>` in log
 - [ ] Get rid of panics
 
 # Nice to have's
 
+- [ ] Integrate Copilot API <-- Good exercise!!
+    - Reference 1: https://github.com/B00TK1D/copilot-api/blob/main/api.py
+    - Reference 2: /home/perfr/workspace/rubberduck.vim/lua/copilot_request.lua
 - [ ] Plugins like [k9s plugins](https://k9scli.io/topics/plugins/)?
 - [ ] claude api support

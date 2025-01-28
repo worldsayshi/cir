@@ -12,37 +12,16 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"github.com/worldsayshi/cir/internal/components"
+	"github.com/worldsayshi/cir/internal/types"
 )
 
-type AiServiceMessage struct {
-	Role    string `json:"role" yaml:"role"`
-	Content string `json:"content" yaml:"content"`
-}
-
-type Message struct {
-	AiServiceMessage     `json:"aiServiceMessage,omitempty" yaml:"aiServiceMessage,omitempty"`
-	Question             string        `json:"question,omitempty" yaml:"question,omitempty"`
-	IncludedWorkingFiles []WorkingFile `json:"included_working_files,omitempty" yaml:"included_working_files,omitempty"`
-}
-
-type WorkingFile struct {
-	Path                  string  `json:"path" yaml:"path"`
-	LastSubmittedChecksum *string `json:"last_submitted_checksum,omitempty" yaml:"last_submitted_checksum,omitempty"`
-	FileContent           []byte  `json:"-" yaml:"-"` // Don't serialize this field
-}
-
-type WorkingSession struct {
-	Messages     []Message     `json:"messages" yaml:"messages"`
-	WorkingFiles []WorkingFile `json:"working_files" yaml:"working_files"`
-	InputText    string        `json:"input_text" yaml:"input_text"`
-}
-
 type CirApplication struct {
-	app            *tview.Application
+	*tview.Application
 	chatHistory    *tview.TextView
-	textInputArea  *tview.TextArea
+	inputArea      *components.InputArea
 	contextBar     *tview.TextView
-	workingSession *WorkingSession
+	workingSession *types.WorkingSession
 	sessionFile    string
 }
 
@@ -68,45 +47,6 @@ func cycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 	}
 }
 
-func initChatHistory(workingSession *WorkingSession) *tview.TextView {
-	chatHistory := tview.NewTextView()
-	chatHistory.
-		SetBorder(true).
-		SetTitle("History")
-	renderChatHistory(chatHistory, workingSession.Messages)
-	return chatHistory
-}
-
-func renderChatHistory(chatHistory *tview.TextView, messages []Message) {
-	msgsString := []string{}
-	for _, msg := range messages {
-		if msg.Role == "user" {
-			msgsString = append(msgsString, msg.Question)
-		} else {
-			msgsString = append(msgsString, msg.Content)
-		}
-	}
-	chatHistory.SetText(strings.Join(msgsString, "\n\n---\n"))
-	chatHistory.ScrollToEnd()
-}
-
-func initContextBar(workingSession *WorkingSession) *tview.TextView {
-	contextBar := tview.NewTextView()
-	contextBar.
-		SetBorder(true).
-		SetTitle("Context")
-	renderContextBar(contextBar, workingSession.WorkingFiles)
-	return contextBar
-}
-
-func renderContextBar(contextBar *tview.TextView, wf []WorkingFile) {
-	s := []string{}
-	for _, f := range wf {
-		s = append(s, f.Path)
-	}
-	contextBar.SetText(strings.Join(s, " | "))
-}
-
 func (app *CirApplication) editContextFiles() {
 	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
 	out, err := exec.Command(
@@ -118,28 +58,17 @@ func (app *CirApplication) editContextFiles() {
 
 	contextFiles := strings.Split(string(out), "\n")
 	// filter out empty strings
-	filteredWorkingFiles := []WorkingFile{}
+	filteredWorkingFiles := []types.WorkingFile{}
 	for _, f := range contextFiles {
 		if f != "" {
-			filteredWorkingFiles = append(filteredWorkingFiles, WorkingFile{Path: f})
+			filteredWorkingFiles = append(filteredWorkingFiles, types.WorkingFile{Path: f})
 		}
 	}
 	app.workingSession.WorkingFiles = filteredWorkingFiles
 	if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 		panic(err)
 	}
-	renderContextBar(app.contextBar, app.workingSession.WorkingFiles)
-}
-
-func initTextInputArea(workingSession *WorkingSession) *tview.TextArea {
-	textInputArea := tview.NewTextArea().
-		SetPlaceholder("Write here")
-	textInputArea.
-		SetBorder(true).
-		SetTitle("Input")
-	textInputArea.
-		SetText(workingSession.InputText, true)
-	return textInputArea
+	components.RenderContextBar(app.contextBar, app.workingSession.WorkingFiles)
 }
 
 func NewCirApplication(sessionFile string) *CirApplication {
@@ -158,12 +87,12 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	contextBar := initContextBar(workingSession)
 
 	// Text input area
-	textInputArea := initTextInputArea(workingSession)
+	inputArea := components.NewInputArea()
 
 	cirApp := &CirApplication{
-		app:            app,
+		Application:    app,
 		chatHistory:    chatHistory,
-		textInputArea:  textInputArea,
+		inputArea:      inputArea,
 		contextBar:     contextBar,
 		workingSession: workingSession,
 		sessionFile:    sessionFile,
@@ -174,33 +103,31 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		app.Draw()
 	})
 
+	inputArea.SetInputText(workingSession.InputText)
+
 	// Update input text in working session
-	textInputArea.SetChangedFunc(func() {
-		cirApp.workingSession.InputText = textInputArea.GetText()
+	inputArea.SetChangedFunc(func() {
+		cirApp.workingSession.InputText = inputArea.GetText()
 	})
 
-	// Ctrl+S to submit
-	textInputArea.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyCtrlS {
-			cirApp.handleChatSubmit()
-			return nil
-		}
-		if event.Key() == tcell.KeyCtrlO {
-			cirApp.editContextFiles()
-			return nil
-		}
+	inputArea.SetSubmitFunc(cirApp.handleChatSubmit)
+	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		return event
 	})
 
-	// Tab and Shift+Tab to cycle focus
-	focusableElements := []tview.Primitive{chatHistory, textInputArea}
+	focusableElements := []tview.Primitive{chatHistory, inputArea}
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
+		// Tab and Shift+Tab to cycle focus
 		case tcell.KeyTab:
 			cycleFocus(app, focusableElements, false)
 			return nil
 		case tcell.KeyBacktab:
 			cycleFocus(app, focusableElements, true)
+			return nil
+		// Ctrl+O to edit context files
+		case tcell.KeyCtrlO:
+			cirApp.editContextFiles()
 			return nil
 		}
 		return event
@@ -283,8 +210,7 @@ func (app *CirApplication) updateWorkingFileChecksums(filesToSubmit []WorkingFil
 	}
 }
 
-func (app *CirApplication) handleChatSubmit() {
-	text := app.textInputArea.GetText()
+func (app *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
 		filesToSubmit := app.getFilesToSubmit()
 		content := prepareUserMessage(filesToSubmit, text)
