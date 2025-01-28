@@ -5,30 +5,31 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/worldsayshi/cir/internal/types"
 	"gopkg.in/yaml.v2"
 )
 
-func loadWorkingSession(sessionFile string) (*WorkingSession, error) {
+func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	log.Println("Loading working session from", sessionFile)
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
 		os.MkdirAll(sessionFileDir, 0755)
-		return &WorkingSession{}, saveWorkingSession(sessionFile, &WorkingSession{})
+		return &types.WorkingSession{}, saveWorkingSession(sessionFile, &types.WorkingSession{})
 	}
 
 	data, err := os.ReadFile(sessionFile)
 	if err != nil {
 		return nil, err
 	}
-	var workingSession WorkingSession
+	var workingSession types.WorkingSession
 	if err := yaml.UnmarshalStrict(data, &workingSession); err != nil {
 		return nil, err
 	}
 	return &workingSession, nil
 }
 
-func saveWorkingSession(sessionFile string, workingSession *WorkingSession) error {
+func saveWorkingSession(sessionFile string, workingSession *types.WorkingSession) error {
 	// Strip out the file content from the working session before saving
 	for i := range workingSession.WorkingFiles {
 		workingSession.WorkingFiles[i].FileContent = nil

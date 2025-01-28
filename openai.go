@@ -9,15 +9,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/worldsayshi/cir/internal/types"
 )
 
 type OpenAIRequest struct {
-	Model    string             `json:"model"`
-	Messages []AiServiceMessage `json:"messages"`
-	Stream   bool               `json:"stream"`
+	Model    string                   `json:"model"`
+	Messages []types.AiServiceMessage `json:"messages"`
+	Stream   bool                     `json:"stream"`
 }
 
-func streamOpenAI(messages []AiServiceMessage) (chan string, chan error) {
+func streamOpenAI(messages []types.AiServiceMessage) (chan string, chan error) {
 	resultChan := make(chan string)
 	errChan := make(chan error)
 
