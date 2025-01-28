@@ -7,7 +7,7 @@ import (
 	"github.com/worldsayshi/cir/internal/types"
 )
 
-func initContextBar(workingSession *types.WorkingSession) *tview.TextView {
+func InitContextBar(workingSession *types.WorkingSession) *tview.TextView {
 	contextBar := tview.NewTextView()
 	contextBar.
 		SetBorder(true).
@@ -16,7 +16,7 @@ func initContextBar(workingSession *types.WorkingSession) *tview.TextView {
 	return contextBar
 }
 
-func RenderContextBar(contextBar *tview.TextView, wf []WorkingFile) {
+func RenderContextBar(contextBar *tview.TextView, wf []types.WorkingFile) {
 	s := []string{}
 	for _, f := range wf {
 		s = append(s, f.Path)

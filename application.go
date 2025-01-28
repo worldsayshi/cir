@@ -81,10 +81,10 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	}
 
 	// Chat history
-	chatHistory := initChatHistory(workingSession)
+	chatHistory := components.InitChatHistory(workingSession)
 
 	// Context bar
-	contextBar := initContextBar(workingSession)
+	contextBar := components.InitContextBar(workingSession)
 
 	// Text input area
 	inputArea := components.NewInputArea()
@@ -140,10 +140,10 @@ func (app *CirApplication) Run() error {
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(app.chatHistory, 0, 5, false).
 		AddItem(app.contextBar, 0, 1, false).
-		AddItem(app.textInputArea, 0, 2, true)
-	if err := app.app.
+		AddItem(app.inputArea, 0, 2, true)
+	if err := app.
 		SetRoot(flex, true).
-		SetFocus(app.textInputArea).Run(); err != nil {
+		SetFocus(app.inputArea).Run(); err != nil {
 		panic(err)
 	}
 	defer func() {
@@ -155,8 +155,8 @@ func (app *CirApplication) Run() error {
 }
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func (app *CirApplication) getFilesToSubmit() []WorkingFile {
-	filesToSubmit := []WorkingFile{}
+func (app *CirApplication) getFilesToSubmit() []types.WorkingFile {
+	filesToSubmit := []types.WorkingFile{}
 	for _, wf := range app.workingSession.WorkingFiles {
 		fileContents, err := os.ReadFile(wf.Path)
 		if err != nil {
@@ -189,7 +189,7 @@ var promptTemplate string = `{{- range .workingFiles -}}
 </question>`
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func prepareUserMessage(filesToSubmit []WorkingFile, question string) string {
+func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) string {
 	var buf bytes.Buffer
 	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
 	templ.Execute(&buf, map[string]interface{}{
@@ -200,7 +200,7 @@ func prepareUserMessage(filesToSubmit []WorkingFile, question string) string {
 }
 
 // Update the checksums of the files that were submitted
-func (app *CirApplication) updateWorkingFileChecksums(filesToSubmit []WorkingFile) {
+func (app *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.WorkingFile) {
 	for i, wf := range app.workingSession.WorkingFiles {
 		for _, wfSubmit := range filesToSubmit {
 			if wf.Path == wfSubmit.Path {
@@ -216,33 +216,33 @@ func (app *CirApplication) handleChatSubmit(text string) {
 		content := prepareUserMessage(filesToSubmit, text)
 		app.workingSession.Messages = append(
 			app.workingSession.Messages,
-			Message{
-				AiServiceMessage:     AiServiceMessage{Role: "user", Content: content},
+			types.Message{
+				AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
 				Question:             text,
 				IncludedWorkingFiles: filesToSubmit,
 			})
 		app.updateWorkingFileChecksums(filesToSubmit)
-		renderChatHistory(app.chatHistory, app.workingSession.Messages)
-		app.textInputArea.SetText("", true)
+		components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
+		app.inputArea.SetText("", true)
 		if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 			panic(err)
 		}
 
 		// Lock the text input area
-		app.textInputArea.SetDisabled(true)
+		app.inputArea.SetDisabled(true)
 
 		// Add empty message for streaming response
 		app.workingSession.Messages = append(
 			app.workingSession.Messages,
-			Message{
-				AiServiceMessage:     AiServiceMessage{Role: "system", Content: ""},
+			types.Message{
+				AiServiceMessage:     types.AiServiceMessage{Role: "system", Content: ""},
 				Question:             "",
-				IncludedWorkingFiles: []WorkingFile{},
+				IncludedWorkingFiles: []types.WorkingFile{},
 			},
 		)
 		lastIdx := len(app.workingSession.Messages) - 1
 
-		serviceMessages := []AiServiceMessage{}
+		serviceMessages := []types.AiServiceMessage{}
 		for _, msg := range app.workingSession.Messages[:lastIdx] {
 			serviceMessages = append(serviceMessages, msg.AiServiceMessage)
 		}
@@ -266,18 +266,18 @@ func (app *CirApplication) handleStreamResponse(resultChan chan string, errChan 
 				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 					panic(err)
 				}
-				app.textInputArea.SetDisabled(false)
+				app.inputArea.SetDisabled(false)
 				return
 			}
 			accumulated += chunk
 			app.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
-			renderChatHistory(app.chatHistory, app.workingSession.Messages)
+			components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
 				app.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
-				renderChatHistory(app.chatHistory, app.workingSession.Messages)
-				app.textInputArea.SetDisabled(false)
+				components.RenderChatHistory(app.chatHistory, app.workingSession.Messages)
+				app.inputArea.SetDisabled(false)
 				if err := saveWorkingSession(app.sessionFile, app.workingSession); err != nil {
 					panic(err)
 				}
