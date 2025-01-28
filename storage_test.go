@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/worldsayshi/cir/internal/types"
 )
 
 func TestSaveAndLoadWorkingSession(t *testing.T) {
@@ -12,12 +14,12 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 	testSessionFile := filepath.Join(tmpDir, "test-session.yaml")
 
 	// Prepare a session to save
-	session := &WorkingSession{
-		Messages: []Message{
-			{AiServiceMessage{Role: "user", Content: "Hello"}, "Hello", nil},
-			{AiServiceMessage{Role: "system", Content: "Hi there!"}, "Hi there!", nil},
+	session := &types.WorkingSession{
+		Messages: []types.Message{
+			{AiServiceMessage: types.AiServiceMessage{Role: "user", Content: "Hello"}, Question: "Hello", IncludedWorkingFiles: nil},
+			{AiServiceMessage: types.AiServiceMessage{Role: "system", Content: "Hi there!"}, Question: "Hi there!", IncludedWorkingFiles: nil},
 		},
-		WorkingFiles: []WorkingFile{
+		WorkingFiles: []types.WorkingFile{
 			{Path: "file1.txt"},
 			{Path: "file2.txt"},
 		},
