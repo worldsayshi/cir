@@ -26,7 +26,7 @@ type CirApplication struct {
 }
 
 // From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
-func cycleFocus(cirApp *CirApplication, elements []tview.Primitive, reverse bool) {
+func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse bool) {
 	for i, el := range elements {
 		if !el.HasFocus() {
 			continue
@@ -118,10 +118,10 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		switch event.Key() {
 		// Tab and Shift+Tab to cycle focus
 		case tcell.KeyTab:
-			cycleFocus(cirApp, focusableElements, false)
+			cirApp.cycleFocus(focusableElements, false)
 			return nil
 		case tcell.KeyBacktab:
-			cycleFocus(cirApp, focusableElements, true)
+			cirApp.cycleFocus(focusableElements, true)
 			return nil
 		// Ctrl+O to edit context files
 		case tcell.KeyCtrlO:
@@ -153,9 +153,9 @@ func (cirApp *CirApplication) Run() error {
 }
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func (cirApp *CirApplication) getFilesToSubmit() []types.WorkingFile {
+func getFilesToSubmit(wfs []types.WorkingFile) []types.WorkingFile {
 	filesToSubmit := []types.WorkingFile{}
-	for _, wf := range cirApp.workingSession.WorkingFiles {
+	for _, wf := range wfs {
 		fileContents, err := os.ReadFile(wf.Path)
 		if err != nil {
 			log.Println("Error reading context file:", wf.Path, err)
@@ -210,7 +210,7 @@ func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.W
 
 func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
-		filesToSubmit := cirApp.getFilesToSubmit()
+		filesToSubmit := getFilesToSubmit(cirApp.workingSession.WorkingFiles)
 		content := prepareUserMessage(filesToSubmit, text)
 		cirApp.workingSession.Messages = append(
 			cirApp.workingSession.Messages,
