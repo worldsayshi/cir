@@ -1,7 +1,9 @@
 package types
 
 import (
+	v1 "github.com/worldsayshi/cir/internal/types/v1"
 	v2 "github.com/worldsayshi/cir/internal/types/v2"
+	// "gopkg.in/yaml.v2"
 )
 
 type ApiVersion string
@@ -22,7 +24,11 @@ type (
 	AiServiceMessage = v2.AiServiceMessage
 )
 
-// func UnmarshalWorkingSession(data []byte) (workingSession WorkingSession, err error) {
-// 	err = yaml.Unmarshal(data, &workingSession)
-// 	return
-// }
+// TODO data is a yaml file. Look for the key `apiVersion` and unmarshal using the corresponding versioned type. I.e. apiVersion == 'v1' means that the yaml should be unmarshaled using v1.WorkingSession. If apiVersion is missing assume that it is v1.
+func UnmarshalWorkingSession(data []byte) (workingSession WorkingSession, err error) {
+	// err = yaml.Unmarshal(data, &workingSession)
+}
+
+// TODO WorkingSession v1 -> v2
+func ConvertWorkingSessionV1ToV2(workingSessionV1 v1.WorkingSession) (workingSessionV2 v2.WorkingSession, err error) {
+}
