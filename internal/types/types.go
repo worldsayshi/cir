@@ -1,24 +1,28 @@
 package types
 
-type AiServiceMessage struct {
-	Role    string `json:"role" yaml:"role"`
-	Content string `json:"content" yaml:"content"`
+import (
+	v2 "github.com/worldsayshi/cir/internal/types/v2"
+)
+
+type ApiVersion string
+
+const (
+	V1 ApiVersion = "v1"
+	V2 ApiVersion = "v2"
+)
+
+type VersionedType struct {
+	*ApiVersion `json:"apiVersion" yaml:"apiVersion"`
 }
 
-type WorkingFile struct {
-	Path                  string  `json:"path" yaml:"path"`
-	LastSubmittedChecksum *string `json:"last_submitted_checksum,omitempty" yaml:"last_submitted_checksum,omitempty"`
-	FileContent           []byte  `json:"-" yaml:"-"` // Don't serialize this field
-}
+type (
+	Message          = v2.Message
+	WorkingFile      = v2.WorkingFile
+	WorkingSession   = v2.WorkingSession
+	AiServiceMessage = v2.AiServiceMessage
+)
 
-type Message struct {
-	AiServiceMessage     `json:"aiServiceMessage,omitempty" yaml:"aiServiceMessage,omitempty"`
-	Question             string        `json:"question,omitempty" yaml:"question,omitempty"`
-	IncludedWorkingFiles []WorkingFile `json:"included_working_files,omitempty" yaml:"included_working_files,omitempty"`
-}
-
-type WorkingSession struct {
-	Messages     []Message     `json:"messages" yaml:"messages"`
-	WorkingFiles []WorkingFile `json:"working_files" yaml:"working_files"`
-	InputText    string        `json:"input_text" yaml:"input_text"`
-}
+// func UnmarshalWorkingSession(data []byte) (workingSession WorkingSession, err error) {
+// 	err = yaml.Unmarshal(data, &workingSession)
+// 	return
+// }
