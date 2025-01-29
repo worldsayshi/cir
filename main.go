@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -23,8 +24,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	versionFlag := flag.Bool("version", false, "print the version and commit id")
 	sessionFile := flag.String("session", path.Join(homedir, ".cir/default-session.yaml"), "path to the session file")
 	flag.Parse()
+
+	if *versionFlag {
+		versionData, err := os.ReadFile("version.txt")
+		if err != nil {
+			fmt.Printf("Error reading version file: %v\n", err)
+			return
+		}
+		fmt.Printf("Version Information:\n%s\n", string(versionData))
+		return
+	}
 
 	logfile, err := setupLogging()
 	if err != nil {
