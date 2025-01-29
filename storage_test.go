@@ -103,12 +103,10 @@ func TestLoadFromPreMadeFile(t *testing.T) {
 	// Write initial session data to the file
 	initialSessionData := `
 messages:
-  - aiServiceMessage:
-        role: "user"
-        content: "Hello"
+  - role: "user"
+    content: "Hello"
 working_files:
   - path: "testfile.txt"
-    last_submitted_checksum: null
 `
 	if _, err := tmpSessionfile.Write([]byte(initialSessionData)); err != nil {
 		t.Fatal(err)
