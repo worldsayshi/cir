@@ -1,6 +1,7 @@
 package types
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,6 +30,12 @@ working_files:
 	assert.NoError(t, err)
 	assert.NotNil(t, workingSession)
 	assert.Equal(t, 2, len(workingSession.Messages))
+	messageToBeContained := "New York"
+	assert.True(t, strings.Contains(workingSession.Messages[0].Content, messageToBeContained),
+		"Expected message %q to contain %q",
+		workingSession.Messages[0].Content,
+		messageToBeContained,
+	)
 	assert.Equal(t, 1, len(workingSession.WorkingFiles))
 	assert.Equal(t, "./test.txt", workingSession.WorkingFiles[0].Path)
 }

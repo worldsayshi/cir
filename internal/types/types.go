@@ -55,6 +55,7 @@ func ConvertWorkingSessionV1ToV2(workingSessionV1 *v1.WorkingSession) (workingSe
 	for _, msgV1 := range workingSessionV1.Messages {
 		wf := convertWorkingFilesV1ToV2(&msgV1.IncludedWorkingFiles)
 		msgV2 := v2.Message{
+			AiServiceMessage:     v2.AiServiceMessage{Role: msgV1.Role, Content: msgV1.Content},
 			Question:             msgV1.Question,
 			IncludedWorkingFiles: *wf,
 		}

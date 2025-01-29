@@ -24,6 +24,18 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
 - Ctrl-s - Submit message
 - (Shift-)Tab - Toggle focus between input and chat history
 
+# Run from this repo
+
+Run:
+```bash
+go run .
+```
+
+Test:
+```bash
+go test ./...
+```
+
 # TODOs for Alpha
 
 - [X] Bug: refactor and fix messages handling so that messages are updated properly
@@ -36,6 +48,7 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
     - [X] Add them but hide them from rendering
     - [ ] Add the file names sent to the printed chat message
     - [/] Add them to the session data, calculate and store checksum whenever they are added to the sent data, only send when checksum change
+- [/] Add backwards compatibility for session yaml storage
 - [X] Prompt templates for sending context
 - [X] Make the history view scrollable
 - [X] QOL: Also store the current wip chat message in the session (on exit?)
