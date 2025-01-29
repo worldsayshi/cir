@@ -6,6 +6,8 @@ type WorkingFile struct {
 }
 
 type Message struct {
+	Role                 string        `json:"role" yaml:"role"`
+	Content              string        `json:"content" yaml:"content"`
 	Question             string        `json:"question,omitempty" yaml:"question,omitempty"`
 	IncludedWorkingFiles []WorkingFile `json:"included_working_files,omitempty" yaml:"included_working_files,omitempty"`
 }

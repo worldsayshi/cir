@@ -22,14 +22,17 @@ func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	if err != nil {
 		return nil, err
 	}
-	var workingSession types.WorkingSession
-	if err := yaml.UnmarshalStrict(data, &workingSession); err != nil {
-		return nil, err
+
+	workingSession, err := types.UnmarshalWorkingSession(data)
+	if err != nil {
+		panic(err)
 	}
-	return &workingSession, nil
+	return workingSession, nil
 }
 
 func saveWorkingSession(sessionFile string, workingSession *types.WorkingSession) error {
+	apiVersion := types.CurrentApiVersion
+	workingSession.ApiVersion = &apiVersion
 	// Strip out the file content from the working session before saving
 	for i := range workingSession.WorkingFiles {
 		workingSession.WorkingFiles[i].FileContent = nil

@@ -1,5 +1,9 @@
 package v2
 
+import (
+	"github.com/worldsayshi/cir/internal/types/versionedtype"
+)
+
 type AiServiceMessage struct {
 	Role    string `json:"role" yaml:"role"`
 	Content string `json:"content" yaml:"content"`
@@ -18,7 +22,8 @@ type Message struct {
 }
 
 type WorkingSession struct {
-	Messages     []Message     `json:"messages" yaml:"messages"`
-	WorkingFiles []WorkingFile `json:"working_files" yaml:"working_files"`
-	InputText    string        `json:"input_text" yaml:"input_text"`
+	*versionedtype.ApiVersion `json:"apiVersion" yaml:"apiVersion"`
+	Messages                  []Message     `json:"messages" yaml:"messages"`
+	WorkingFiles              []WorkingFile `json:"working_files" yaml:"working_files"`
+	InputText                 string        `json:"input_text" yaml:"input_text"`
 }
