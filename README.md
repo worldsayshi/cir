@@ -1,7 +1,7 @@
 
 A LLM Chat client on the terminal built with `tview`.
 
-Status: Pre-Alpha
+Status: Alpha-ish
 
 # Requirements
 
@@ -36,7 +36,9 @@ Test:
 go test ./...
 ```
 
-# TODOs for Beta
+# Backlog
+
+## TODOs for Beta
 
 - [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
     - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
@@ -46,7 +48,27 @@ go test ./...
 - [ ] Bug: Getting `Error: <nil>` in log
 - [ ] Cleanup: Get rid of frivolous panics
 
-# Alpha TODO log
+## Session selector
+
+- [ ] Session selector v1: Multiple session switcher and multiple sessions in .cir folder in ./cir/sessions/
+    - [ ] Allow migrating from a single session to multiple
+    - [ ] Select the default session
+    - [] Keep track of cwd for the session
+- [ ] Session selector v2:
+    - [ ] Keep track of all sessions that have been opened by adding a session reference in ~/.cir/sessions.yaml¨
+    - [ ] Deal with moved sessions somehow
+
+## Nice to have's
+
+- [ ] Integrate Copilot API <-- Good exercise!!
+    - Reference 1: https://github.com/B00TK1D/copilot-api/blob/main/api.py
+    - Reference 2: /rubberduck.vim/lua/copilot_request.lua
+- [ ] Plugins like [k9s plugins](https://k9scli.io/topics/plugins/)?
+- [ ] claude api support
+
+# Done
+
+## Alpha
 
 - [X] Bug: refactor and fix messages handling so that messages are updated properly
 - [X] adding context files using fzf?
@@ -60,11 +82,3 @@ go test ./...
 - [X] Prompt templates for sending context
 - [X] Make the history view scrollable
 - [X] QOL: Also store the current wip chat message in the session (on exit?)
-
-# Nice to have's
-
-- [ ] Integrate Copilot API <-- Good exercise!!
-    - Reference 1: https://github.com/B00TK1D/copilot-api/blob/main/api.py
-    - Reference 2: /rubberduck.vim/lua/copilot_request.lua
-- [ ] Plugins like [k9s plugins](https://k9scli.io/topics/plugins/)?
-- [ ] claude api support
