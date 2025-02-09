@@ -18,7 +18,7 @@ import (
 
 type CirApplication struct {
 	*tview.Application
-	chatHistory    *tview.TextView
+	chatHistory    *components.ChatHistory
 	inputArea      *components.InputArea
 	contextBar     *components.ContextBar
 	workingSession *types.WorkingSession
@@ -79,7 +79,7 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	}
 
 	// Chat history
-	chatHistory := components.InitChatHistory(workingSession)
+	chatHistory := components.NewChatHistory(workingSession)
 
 	// Context bar
 	contextBar := components.NewContextBar(&workingSession.WorkingFiles)
@@ -220,7 +220,7 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 				IncludedWorkingFiles: filesToSubmit,
 			})
 		cirApp.updateWorkingFileChecksums(filesToSubmit)
-		components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
+		cirApp.chatHistory.Render(cirApp.workingSession.Messages)
 		cirApp.inputArea.SetText("", true)
 		if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 			panic(err)
@@ -269,12 +269,12 @@ func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errCh
 			}
 			accumulated += chunk
 			cirApp.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
-			components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
+			cirApp.chatHistory.Render(cirApp.workingSession.Messages)
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
 				cirApp.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
-				components.RenderChatHistory(cirApp.chatHistory, cirApp.workingSession.Messages)
+				cirApp.chatHistory.Render(cirApp.workingSession.Messages)
 				cirApp.inputArea.SetDisabled(false)
 				if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
 					panic(err)

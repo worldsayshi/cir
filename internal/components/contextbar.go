@@ -20,7 +20,7 @@ func NewContextBar(workingFiles *[]types.WorkingFile) (contextBar *ContextBar) {
 	return contextBar
 }
 
-func (contextBar ContextBar) Render(wf []types.WorkingFile) {
+func (contextBar *ContextBar) Render(wf []types.WorkingFile) {
 	s := []string{}
 	for _, f := range wf {
 		s = append(s, f.Path)
