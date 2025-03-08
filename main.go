@@ -8,6 +8,7 @@ import (
 	"path"
 )
 
+// Hello
 func setupLogging() (f *os.File, err error) {
 	f, err = os.OpenFile("cir.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
