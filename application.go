@@ -153,7 +153,7 @@ func (cirApp *CirApplication) Run() error {
 }
 
 // Add WorkingFiles to the content iff checksum is nill or changed
-func getFilesToSubmit(wfs []types.WorkingFile) []types.WorkingFile {
+func getFilesToSubmitWithChecksums(wfs []types.WorkingFile) []types.WorkingFile {
 	filesToSubmit := []types.WorkingFile{}
 	for _, wf := range wfs {
 		fileContents, err := os.ReadFile(wf.Path)
@@ -210,7 +210,8 @@ func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.W
 
 func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
-		filesToSubmit := getFilesToSubmit(cirApp.workingSession.WorkingFiles)
+
+		filesToSubmit := getFilesToSubmitWithChecksums(cirApp.workingSession.WorkingFiles)
 		content := prepareUserMessage(filesToSubmit, text)
 		cirApp.workingSession.Messages = append(
 			cirApp.workingSession.Messages,

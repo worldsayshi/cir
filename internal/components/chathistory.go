@@ -21,15 +21,6 @@ func NewChatHistory(workingSession *types.WorkingSession) (chatHistory *ChatHist
 	return chatHistory
 }
 
-// func InitChatHistory(workingSession *types.WorkingSession) *tview.TextView {
-// 	chatHistory := tview.NewTextView()
-// 	chatHistory.
-// 		SetBorder(true).
-// 		SetTitle("History")
-// 	RenderChatHistory(chatHistory, workingSession.Messages)
-// 	return chatHistory
-// }
-
 func (chatHistory *ChatHistory) Render(messages []types.Message) {
 	msgsString := []string{}
 	for _, msg := range messages {

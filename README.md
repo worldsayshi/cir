@@ -42,9 +42,9 @@ go test ./...
 
 - [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
     - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
+- [ ] Allow code edits
 - [ ] More context info
     - [ ] Add the file names sent to the printed chat message
-- [ ] Allow code edits
 - [ ] Bug: Getting `Error: <nil>` in log
 - [ ] Cleanup: Get rid of frivolous panics
 
