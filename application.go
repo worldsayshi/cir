@@ -25,52 +25,6 @@ type CirApplication struct {
 	sessionFile    string
 }
 
-// From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
-func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse bool) {
-	for i, el := range elements {
-		if !el.HasFocus() {
-			continue
-		}
-
-		if reverse {
-			i = i - 1
-			if i < 0 {
-				i = len(elements) - 1
-			}
-		} else {
-			i = i + 1
-			i = i % len(elements)
-		}
-
-		cirApp.SetFocus(elements[i])
-		return
-	}
-}
-
-func (cirApp *CirApplication) editContextFiles() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
-	out, err := exec.Command(
-		"bash", "-c", cmd,
-	).CombinedOutput()
-	if err != nil {
-		log.Println(err)
-	}
-
-	contextFiles := strings.Split(string(out), "\n")
-	// filter out empty strings
-	selectedWorkingFiles := []types.WorkingFile{}
-	for _, f := range contextFiles {
-		if f != "" {
-			selectedWorkingFiles = append(selectedWorkingFiles, types.WorkingFile{Path: f})
-		}
-	}
-	cirApp.workingSession.WorkingFiles = selectedWorkingFiles
-	if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
-		panic(err)
-	}
-	cirApp.contextBar.Render(cirApp.workingSession.WorkingFiles)
-}
-
 func NewCirApplication(sessionFile string) *CirApplication {
 	workingSession, err := loadWorkingSession(sessionFile)
 	if err != nil {
@@ -79,10 +33,10 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	}
 
 	// Chat history
-	chatHistory := components.NewChatHistory(workingSession)
+	chatHistory := components.NewChatHistory(workingSession.Messages)
 
 	// Context bar
-	contextBar := components.NewContextBar(&workingSession.WorkingFiles)
+	contextBar := components.NewContextBar(workingSession.WorkingFiles)
 
 	// Text input area
 	inputArea := components.NewInputArea()
@@ -134,6 +88,52 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	return cirApp
 }
 
+// From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
+func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse bool) {
+	for i, el := range elements {
+		if !el.HasFocus() {
+			continue
+		}
+
+		if reverse {
+			i = i - 1
+			if i < 0 {
+				i = len(elements) - 1
+			}
+		} else {
+			i = i + 1
+			i = i % len(elements)
+		}
+
+		cirApp.SetFocus(elements[i])
+		return
+	}
+}
+
+func (cirApp *CirApplication) editContextFiles() {
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
+	out, err := exec.Command(
+		"bash", "-c", cmd,
+	).CombinedOutput()
+	if err != nil {
+		log.Println(err)
+	}
+
+	contextFiles := strings.Split(string(out), "\n")
+	// filter out empty strings
+	selectedWorkingFiles := []types.WorkingFile{}
+	for _, f := range contextFiles {
+		if f != "" {
+			selectedWorkingFiles = append(selectedWorkingFiles, types.WorkingFile{Path: f})
+		}
+	}
+	cirApp.workingSession.WorkingFiles = selectedWorkingFiles
+	if err := saveWorkingSession(cirApp.sessionFile, cirApp.workingSession); err != nil {
+		panic(err)
+	}
+	cirApp.contextBar.Render(cirApp.workingSession.WorkingFiles)
+}
+
 func (cirApp *CirApplication) Run() error {
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(cirApp.chatHistory, 0, 5, false).
@@ -152,58 +152,8 @@ func (cirApp *CirApplication) Run() error {
 	return nil
 }
 
-// Add WorkingFiles to the content iff checksum is nill or changed
-func getFilesToSubmitWithChecksums(wfs []types.WorkingFile) []types.WorkingFile {
-	filesToSubmit := []types.WorkingFile{}
-	for _, wf := range wfs {
-		fileContents, err := os.ReadFile(wf.Path)
-		if err != nil {
-			log.Println("Error reading context file:", wf.Path, err)
-			continue
-		}
-		checksum := fmt.Sprintf("%x", md5.Sum(fileContents))
-		if wf.LastSubmittedChecksum == nil {
-			wf.LastSubmittedChecksum = &checksum
-			wf.FileContent = fileContents
-			filesToSubmit = append(filesToSubmit, wf)
-			continue
-		}
-		if checksum != *wf.LastSubmittedChecksum {
-			wf.LastSubmittedChecksum = &checksum
-			wf.FileContent = fileContents
-			filesToSubmit = append(filesToSubmit, wf)
-		}
-	}
-	return filesToSubmit
-}
-
-var promptTemplate string = `{{- range .workingFiles -}}
-<context file="{{.Path}}">
-{{ printf "%s" .FileContent }}
-</context>
-{{- end }}
-<question>
-{{.question}}
-</question>`
-
-// Prepare the user message using the template
-func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) types.Message {
-	var buf bytes.Buffer
-	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
-	templ.Execute(&buf, map[string]interface{}{
-		"workingFiles": filesToSubmit,
-		"question":     question,
-	})
-	content := buf.String()
-	userMessage := types.Message{
-		AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
-		Question:             question,
-		IncludedWorkingFiles: filesToSubmit,
-	}
-	return userMessage
-}
-
 // Update the checksums of the files that were submitted
+// Checksums have already been calculated in the filesToSubmit
 func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.WorkingFile) {
 	for i, wf := range cirApp.workingSession.WorkingFiles {
 		for _, wfSubmit := range filesToSubmit {
@@ -212,17 +162,6 @@ func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.W
 			}
 		}
 	}
-}
-
-func (cirApp *CirApplication) getServiceMessages() []types.AiServiceMessage {
-
-	lastIdx := len(cirApp.workingSession.Messages) - 1
-
-	serviceMessages := []types.AiServiceMessage{}
-	for _, msg := range cirApp.workingSession.Messages[:lastIdx] {
-		serviceMessages = append(serviceMessages, msg.AiServiceMessage)
-	}
-	return serviceMessages
 }
 
 func (cirApp *CirApplication) handleChatSubmit(text string) {
@@ -254,7 +193,7 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 			},
 		)
 
-		serviceMessages := cirApp.getServiceMessages()
+		serviceMessages := getServiceMessages(cirApp.workingSession.Messages)
 
 		// Start streaming
 		resultChan, errChan := streamOpenAI(serviceMessages)
@@ -294,4 +233,66 @@ func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errCh
 			}
 		}
 	}
+}
+
+// Add WorkingFiles to the content iff checksum is nill or changed
+func getFilesToSubmitWithChecksums(wfs []types.WorkingFile) []types.WorkingFile {
+	filesToSubmit := []types.WorkingFile{}
+	for _, wf := range wfs {
+		fileContents, err := os.ReadFile(wf.Path)
+		if err != nil {
+			log.Println("Error reading context file:", wf.Path, err)
+			continue
+		}
+		checksum := fmt.Sprintf("%x", md5.Sum(fileContents))
+		if wf.LastSubmittedChecksum == nil {
+			wf.LastSubmittedChecksum = &checksum
+			wf.FileContent = fileContents
+			filesToSubmit = append(filesToSubmit, wf)
+			continue
+		}
+		if checksum != *wf.LastSubmittedChecksum {
+			wf.LastSubmittedChecksum = &checksum
+			wf.FileContent = fileContents
+			filesToSubmit = append(filesToSubmit, wf)
+		}
+	}
+	return filesToSubmit
+}
+
+func getServiceMessages(messages []types.Message) []types.AiServiceMessage {
+
+	lastIdx := len(messages) - 1
+
+	serviceMessages := []types.AiServiceMessage{}
+	for _, msg := range messages[:lastIdx] {
+		serviceMessages = append(serviceMessages, msg.AiServiceMessage)
+	}
+	return serviceMessages
+}
+
+var promptTemplate string = `{{- range .workingFiles -}}
+<context file="{{.Path}}">
+{{ printf "%s" .FileContent }}
+</context>
+{{- end }}
+<question>
+{{.question}}
+</question>`
+
+// Prepare the user message using the template
+func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) types.Message {
+	var buf bytes.Buffer
+	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
+	templ.Execute(&buf, map[string]interface{}{
+		"workingFiles": filesToSubmit,
+		"question":     question,
+	})
+	content := buf.String()
+	userMessage := types.Message{
+		AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
+		Question:             question,
+		IncludedWorkingFiles: filesToSubmit,
+	}
+	return userMessage
 }

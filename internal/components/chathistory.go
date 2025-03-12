@@ -11,12 +11,12 @@ type ChatHistory struct {
 	*tview.TextView
 }
 
-func NewChatHistory(workingSession *types.WorkingSession) (chatHistory *ChatHistory) {
+func NewChatHistory(messages []types.Message) (chatHistory *ChatHistory) {
 	chatHistory = &ChatHistory{TextView: tview.NewTextView()}
 	chatHistory.
 		SetBorder(true).
 		SetTitle("History")
-	chatHistory.Render(workingSession.Messages)
+	chatHistory.Render(messages)
 
 	return chatHistory
 }

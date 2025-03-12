@@ -11,12 +11,12 @@ type ContextBar struct {
 	*tview.TextView
 }
 
-func NewContextBar(workingFiles *[]types.WorkingFile) (contextBar *ContextBar) {
+func NewContextBar(workingFiles []types.WorkingFile) (contextBar *ContextBar) {
 	contextBar = &ContextBar{TextView: tview.NewTextView()}
 	contextBar.
 		SetBorder(true).
 		SetTitle("Context")
-	contextBar.Render(*workingFiles)
+	contextBar.Render(workingFiles)
 	return contextBar
 }
 
