@@ -40,13 +40,19 @@ go test ./...
 
 ## TODOs for Beta
 
-- [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
-    - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
 - [ ] Allow code edits
+    - Let's just start by parsing out files from answer.
+    - Do I need edit mode?
+        - shortcut key -> toggle edit mode
+        - edit mode:
+            - add system message -> explanation + syntax?
+            - on response, split out edits from returned prompt
 - [ ] More context info
     - [ ] Add the file names sent to the printed chat message
 - [ ] Bug: Getting `Error: <nil>` in log
 - [ ] Cleanup: Get rid of frivolous panics
+- [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
+    - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
 
 ## Session selector
 

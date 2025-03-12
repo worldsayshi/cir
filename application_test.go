@@ -51,7 +51,7 @@ This is a test file.
 <question>
 What is the content of the test file?
 </question>`
-	if userMessage != expectedContent {
-		t.Errorf("Expected user message to be:\n%s\nBut got:\n%s", expectedContent, userMessage)
+	if userMessage.Content != expectedContent {
+		t.Errorf("Expected user message to be:\n%s\nBut got:\n%s", expectedContent, userMessage.Content)
 	}
 }

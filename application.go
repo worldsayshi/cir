@@ -186,15 +186,21 @@ var promptTemplate string = `{{- range .workingFiles -}}
 {{.question}}
 </question>`
 
-// Add WorkingFiles to the content iff checksum is nill or changed
-func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) string {
+// Prepare the user message using the template
+func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) types.Message {
 	var buf bytes.Buffer
 	templ := template.Must(template.New("promptTemplate").Parse(promptTemplate))
 	templ.Execute(&buf, map[string]interface{}{
 		"workingFiles": filesToSubmit,
 		"question":     question,
 	})
-	return buf.String()
+	content := buf.String()
+	userMessage := types.Message{
+		AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
+		Question:             question,
+		IncludedWorkingFiles: filesToSubmit,
+	}
+	return userMessage
 }
 
 // Update the checksums of the files that were submitted
@@ -208,18 +214,26 @@ func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.W
 	}
 }
 
+func (cirApp *CirApplication) getServiceMessages() []types.AiServiceMessage {
+
+	lastIdx := len(cirApp.workingSession.Messages) - 1
+
+	serviceMessages := []types.AiServiceMessage{}
+	for _, msg := range cirApp.workingSession.Messages[:lastIdx] {
+		serviceMessages = append(serviceMessages, msg.AiServiceMessage)
+	}
+	return serviceMessages
+}
+
 func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
 
 		filesToSubmit := getFilesToSubmitWithChecksums(cirApp.workingSession.WorkingFiles)
-		content := prepareUserMessage(filesToSubmit, text)
+		userMessage := prepareUserMessage(filesToSubmit, text)
+
 		cirApp.workingSession.Messages = append(
-			cirApp.workingSession.Messages,
-			types.Message{
-				AiServiceMessage:     types.AiServiceMessage{Role: "user", Content: content},
-				Question:             text,
-				IncludedWorkingFiles: filesToSubmit,
-			})
+			cirApp.workingSession.Messages, userMessage,
+		)
 		cirApp.updateWorkingFileChecksums(filesToSubmit)
 		cirApp.chatHistory.Render(cirApp.workingSession.Messages)
 		cirApp.inputArea.SetText("", true)
@@ -234,17 +248,13 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 		cirApp.workingSession.Messages = append(
 			cirApp.workingSession.Messages,
 			types.Message{
-				AiServiceMessage:     types.AiServiceMessage{Role: "system", Content: ""},
+				AiServiceMessage:     types.AiServiceMessage{Role: "assistant", Content: ""},
 				Question:             "",
 				IncludedWorkingFiles: []types.WorkingFile{},
 			},
 		)
-		lastIdx := len(cirApp.workingSession.Messages) - 1
 
-		serviceMessages := []types.AiServiceMessage{}
-		for _, msg := range cirApp.workingSession.Messages[:lastIdx] {
-			serviceMessages = append(serviceMessages, msg.AiServiceMessage)
-		}
+		serviceMessages := cirApp.getServiceMessages()
 
 		// Start streaming
 		resultChan, errChan := streamOpenAI(serviceMessages)
