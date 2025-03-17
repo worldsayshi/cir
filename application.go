@@ -164,12 +164,33 @@ func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.W
 	}
 }
 
+func createSystemMessage() types.Message {
+	systemMessage := types.Message{
+		AiServiceMessage: types.AiServiceMessage{
+			Role: "system",
+			Content: `The assistant is Cir, a conversational AI and a coding assistant.
+Any code or other file content rendered by the assistant should be rendered with markdown
+backticks and should always specify the file path as the comment in the first line of the code block.
+Example:
+` + "```python" + `
+# main.py
+print("Hello, World!")
+` + "```",
+		},
+	}
+	return systemMessage
+}
+
 func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text != "" {
+		if len(cirApp.workingSession.Messages) == 0 {
+			cirApp.workingSession.Messages = append(cirApp.workingSession.Messages,
+				createSystemMessage())
+		}
 
 		filesToSubmit := getFilesToSubmitWithChecksums(cirApp.workingSession.WorkingFiles)
-		userMessage := prepareUserMessage(filesToSubmit, text)
 
+		userMessage := prepareUserMessage(filesToSubmit, text)
 		cirApp.workingSession.Messages = append(
 			cirApp.workingSession.Messages, userMessage,
 		)
@@ -261,7 +282,6 @@ func getFilesToSubmitWithChecksums(wfs []types.WorkingFile) []types.WorkingFile 
 }
 
 func getServiceMessages(messages []types.Message) []types.AiServiceMessage {
-
 	lastIdx := len(messages) - 1
 
 	serviceMessages := []types.AiServiceMessage{}

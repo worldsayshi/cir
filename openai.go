@@ -14,9 +14,10 @@ import (
 )
 
 type OpenAIRequest struct {
-	Model    string                   `json:"model"`
-	Messages []types.AiServiceMessage `json:"messages"`
-	Stream   bool                     `json:"stream"`
+	Model       string                   `json:"model"`
+	Messages    []types.AiServiceMessage `json:"messages"`
+	Stream      bool                     `json:"stream"`
+	Temperature float32                  `json:"temperature"`
 }
 
 func streamOpenAI(messages []types.AiServiceMessage) (chan string, chan error) {
@@ -30,9 +31,10 @@ func streamOpenAI(messages []types.AiServiceMessage) (chan string, chan error) {
 		openAIMessages := messages[:]
 
 		reqBody := OpenAIRequest{
-			Model:    "gpt-4o-2024-08-06",
-			Messages: openAIMessages,
-			Stream:   true,
+			Model:       "gpt-4o-2024-08-06",
+			Messages:    openAIMessages,
+			Stream:      true,
+			Temperature: 0,
 		}
 
 		jsonData, err := json.Marshal(reqBody)

@@ -9,13 +9,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+func NewWorkingSession() *types.WorkingSession {
+	// This is the system message for the assistant
+	return &types.WorkingSession{
+		Messages:     []types.Message{},
+		WorkingFiles: []types.WorkingFile{},
+		InputText:    "",
+	}
+}
+
 func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	log.Println("Loading working session from", sessionFile)
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
 		os.MkdirAll(sessionFileDir, 0755)
-		return &types.WorkingSession{}, saveWorkingSession(sessionFile, &types.WorkingSession{})
+		ws := NewWorkingSession()
+		return ws, saveWorkingSession(sessionFile, ws)
 	}
 
 	data, err := os.ReadFile(sessionFile)

@@ -24,9 +24,10 @@ func NewChatHistory(messages []types.Message) (chatHistory *ChatHistory) {
 func (chatHistory *ChatHistory) Render(messages []types.Message) {
 	msgsString := []string{}
 	for _, msg := range messages {
-		if msg.Role == "user" {
+		switch msg.Role {
+		case "user":
 			msgsString = append(msgsString, msg.Question)
-		} else {
+		case "assistant":
 			msgsString = append(msgsString, msg.Content)
 		}
 	}
