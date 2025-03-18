@@ -114,9 +114,8 @@ func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse boo
 }
 
 func (cirApp *CirApplication) openSessionFile() {
-	sessionFindingCommand := `find $(pwd) $(while [ "$(pwd)" != "/" ]; do cd ..; echo $(pwd); done) -path "*/.cir" -o -path "$(pwd)" -o -path "*/$(basename $(pwd))" | xargs -I{} find {} -type f \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \;`
-	tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m` // ` | xargs -I{} tmux split-window -h -p 50 -c {}`
-	//tmuxSessionFindingCommand := `tmux list-panes -F "#{pane_current_path}" | xargs -I{} find {} -type f \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \;`
+	sessionFindingCommand := `(dir=$(pwd); while [ "$dir" != "/" ]; do find "$dir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; if [ -d "$dir/.cir" ]; then find "$dir/.cir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; fi; dir=$(dirname "$dir"); done)`
+	tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m`
 	out, err := exec.Command(
 		"bash", "-c", tmuxSessionFindingCommand,
 	).CombinedOutput()

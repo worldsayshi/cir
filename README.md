@@ -46,7 +46,8 @@ HERE!
 - [/] Find all files that can be opened as sessions and select one
     - Store `kind: WorkingSession` for making it easier to find them
     - Search upwards in file tree, see https://claude.ai/chat/0946b93d-a0e6-49cf-a0ba-3eece3f30b5e
-- [ ] Use key shortcut at first? Have a sane default to open, then use shortcut to open some other session.
+- [X] Use key shortcut at first? Have a sane default to open, then use shortcut to open some other session.
+- [ ] Load session on selection! <-- HERE!
 - Key to create new session?
 
 ## TODOs for Beta
@@ -58,6 +59,7 @@ HERE!
         - edit mode:
             - add system message -> explanation + syntax?
             - on response, split out edits from returned prompt
+- [ ] Summary of keymaps, when pressing '?'
 - [ ] More context info
     - [ ] Add the file names sent to the printed chat message
 - [ ] Bug: Getting `Error: <nil>` in log
