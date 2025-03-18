@@ -122,7 +122,12 @@ func (cirApp *CirApplication) openSessionFile() {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(string(out))
+	filePath := strings.TrimSpace(string(out))
+	if filePath == "" {
+		return
+	}
+	log.Println(filePath)
+	// TODO open the selected file
 }
 
 func (cirApp *CirApplication) editContextFiles() {
