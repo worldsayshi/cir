@@ -42,6 +42,7 @@ func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 
 func saveWorkingSession(sessionFile string, workingSession *types.WorkingSession) error {
 	apiVersion := types.CurrentApiVersion
+	workingSession.Kind = "WorkingSession"
 	workingSession.ApiVersion = &apiVersion
 	// Strip out the file content from the working session before saving
 	for i := range workingSession.WorkingFiles {

@@ -9,4 +9,5 @@ const (
 
 type VersionedType struct {
 	*ApiVersion `json:"apiVersion" yaml:"apiVersion"`
+	Kind        string `json:"kind" yaml:"kind"`
 }

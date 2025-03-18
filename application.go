@@ -77,8 +77,11 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		case tcell.KeyBacktab:
 			cirApp.cycleFocus(focusableElements, true)
 			return nil
-		// Ctrl+O to edit context files
-		case tcell.KeyCtrlO:
+		case tcell.KeyCtrlE:
+			cirApp.openSessionFile()
+			return nil
+		// Ctrl+Y to edit context files
+		case tcell.KeyCtrlY:
 			cirApp.editContextFiles()
 			return nil
 		}
@@ -108,6 +111,19 @@ func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse boo
 		cirApp.SetFocus(elements[i])
 		return
 	}
+}
+
+func (cirApp *CirApplication) openSessionFile() {
+	sessionFindingCommand := `find $(pwd) $(while [ "$(pwd)" != "/" ]; do cd ..; echo $(pwd); done) -path "*/.cir" -o -path "$(pwd)" -o -path "*/$(basename $(pwd))" | xargs -I{} find {} -type f \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \;`
+	tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m` // ` | xargs -I{} tmux split-window -h -p 50 -c {}`
+	//tmuxSessionFindingCommand := `tmux list-panes -F "#{pane_current_path}" | xargs -I{} find {} -type f \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \;`
+	out, err := exec.Command(
+		"bash", "-c", tmuxSessionFindingCommand,
+	).CombinedOutput()
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(string(out))
 }
 
 func (cirApp *CirApplication) editContextFiles() {

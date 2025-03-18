@@ -38,9 +38,20 @@ go test ./...
 
 # Backlog
 
+
+## Simpler session selector
+
+HERE!
+
+- [/] Find all files that can be opened as sessions and select one
+    - Store `kind: WorkingSession` for making it easier to find them
+    - Search upwards in file tree, see https://claude.ai/chat/0946b93d-a0e6-49cf-a0ba-3eece3f30b5e
+- [ ] Use key shortcut at first? Have a sane default to open, then use shortcut to open some other session.
+- Key to create new session?
+
 ## TODOs for Beta
 
-- [ ] Allow code edits
+- [/] Allow code edits
     - Let's just start by parsing out files from answer.
     - Do I need edit mode?
         - shortcut key -> toggle edit mode

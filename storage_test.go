@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/worldsayshi/cir/internal/types"
@@ -81,6 +82,14 @@ func TestLoadNewWorkingSession(t *testing.T) {
 		t.Fatalf("Session file should have been created")
 	}
 
+	// Check that tmpSessionfile contains `kind: WorkingSession`
+	if c, err := os.ReadFile(testSessionFile); err != nil {
+		t.Fatal(err)
+	} else if !(strings.Contains(string(c), "kind: WorkingSession") ||
+		strings.Contains(string(c), "kind: \"WorkingSession\"")) {
+		t.Fatalf("Expected 'kind: WorkingSession', got %s", c)
+	}
+
 	// Load the session again to ensure it is still empty
 	loadedSession, err := loadWorkingSession(testSessionFile)
 	if err != nil {
@@ -114,6 +123,7 @@ working_files:
 	if err := tmpSessionfile.Close(); err != nil {
 		t.Fatal(err)
 	}
+
 	// Initialize CirApplication
 	workingSession, err := loadWorkingSession(tmpSessionfile.Name())
 	if err != nil {

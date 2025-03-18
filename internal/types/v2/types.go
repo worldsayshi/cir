@@ -23,6 +23,7 @@ type Message struct {
 
 type WorkingSession struct {
 	*versionedtype.ApiVersion `json:"apiVersion" yaml:"apiVersion"`
+	Kind                      string        `json:"kind" yaml:"kind"`
 	Messages                  []Message     `json:"messages" yaml:"messages"`
 	WorkingFiles              []WorkingFile `json:"working_files" yaml:"working_files"`
 	InputText                 string        `json:"input_text" yaml:"input_text"`

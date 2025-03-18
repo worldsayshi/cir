@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"gopkg.in/yaml.v2"
 
 	v1 "github.com/worldsayshi/cir/internal/types/v1"
@@ -33,6 +35,18 @@ func UnmarshalWorkingSession(data []byte) (workingSession *v2.WorkingSession, er
 		apiVersion = *vt.ApiVersion
 	}
 
+	// If it's an unknown kind or missing, assume WorkingSession
+	var kind string
+	if vt.Kind != "" {
+		kind = vt.Kind
+	} else {
+		kind = "WorkingSession"
+	}
+
+	if kind != "WorkingSession" {
+		return nil, fmt.Errorf("Unknown kind: %v", kind)
+	}
+
 	switch apiVersion {
 	case versionedtype.V1:
 		var workingSessionV1 v1.WorkingSession
@@ -46,7 +60,8 @@ func UnmarshalWorkingSession(data []byte) (workingSession *v2.WorkingSession, er
 		}
 		return workingSession, nil
 	default:
-		panic("Unknown API version: " + apiVersion)
+		return nil, fmt.Errorf("Unknown API version: %v", apiVersion)
+		// ("Unknown API version: " + apiVersion)
 	}
 }
 
