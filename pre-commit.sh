@@ -1,4 +1,6 @@
 #!/bin/bash
+# Currently unused!
+
 ver_file=version.txt
 > $ver_file
 date +"%Y-%m-%d %T %:z" >> $ver_file
