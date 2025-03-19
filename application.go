@@ -127,7 +127,29 @@ func (cirApp *CirApplication) openSessionFile() {
 		return
 	}
 	log.Println(filePath)
-	// TODO open the selected file
+
+	// Load the selected session file
+	newWorkingSession, err := loadWorkingSession(filePath)
+	if err != nil {
+		log.Printf("Error loading session from file: %v\n%v", filePath, err)
+		return
+	}
+
+	fmt.Println(newWorkingSession)
+
+	// TODO It hangs after this for some reason!
+
+	// Update the current session
+	// cirApp.workingSession = newWorkingSession
+	// cirApp.sessionFile = filePath
+
+	// // Update UI components with new session data
+	// cirApp.chatHistory.Render(cirApp.workingSession.Messages)
+	// cirApp.contextBar.Render(cirApp.workingSession.WorkingFiles)
+	// cirApp.inputArea.SetText(cirApp.workingSession.InputText, true)
+
+	// // Force a redraw of the application
+	// cirApp.Draw()
 }
 
 func (cirApp *CirApplication) editContextFiles() {

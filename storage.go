@@ -37,6 +37,8 @@ func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println("Working session loaded from", sessionFile)
 	return workingSession, nil
 }
 
