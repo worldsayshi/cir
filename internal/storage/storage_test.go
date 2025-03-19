@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"fmt"
@@ -27,12 +27,12 @@ func TestSaveAndLoadWorkingSession(t *testing.T) {
 	}
 
 	// Try saving
-	if err := saveWorkingSession(testSessionFile, session); err != nil {
+	if err := SaveWorkingSession(testSessionFile, session); err != nil {
 		t.Fatalf("Failed to save session: %v", err)
 	}
 
 	// Now load it back
-	loadedSession, err := loadWorkingSession(testSessionFile)
+	loadedSession, err := LoadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load session: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestLoadNewWorkingSession(t *testing.T) {
 	}
 
 	// Load session, which should create a new one
-	workingSession, err := loadWorkingSession(testSessionFile)
+	workingSession, err := LoadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load new session: %v", err)
 	}
@@ -91,7 +91,7 @@ func TestLoadNewWorkingSession(t *testing.T) {
 	}
 
 	// Load the session again to ensure it is still empty
-	loadedSession, err := loadWorkingSession(testSessionFile)
+	loadedSession, err := LoadWorkingSession(testSessionFile)
 	if err != nil {
 		t.Fatalf("Failed to load session: %v", err)
 	}
@@ -125,7 +125,7 @@ working_files:
 	}
 
 	// Initialize CirApplication
-	workingSession, err := loadWorkingSession(tmpSessionfile.Name())
+	workingSession, err := LoadWorkingSession(tmpSessionfile.Name())
 	if err != nil {
 		t.Fatal(err)
 	}

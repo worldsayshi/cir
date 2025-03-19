@@ -13,6 +13,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"github.com/worldsayshi/cir/internal/components"
+	"github.com/worldsayshi/cir/internal/storage"
 	"github.com/worldsayshi/cir/internal/types"
 )
 
@@ -35,7 +36,7 @@ type CirApplication struct {
 
 func NewCirApplication(sessionFile string) *CirApplication {
 	// Initialize state
-	workingSession, err := loadWorkingSession(sessionFile)
+	workingSession, err := storage.LoadWorkingSession(sessionFile)
 	if err != nil {
 		log.Println("Error loading session from file:", sessionFile)
 		panic(fmt.Sprintf("Error loading session from file: %v\n%v", sessionFile, err))
@@ -105,7 +106,7 @@ func (cirApp *CirApplication) updateState(updateFunc func(*AppState) bool) {
 	}
 
 	// Save state changes to disk
-	if err := saveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
+	if err := storage.SaveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
 		log.Println("Error saving session:", err)
 	}
 }
@@ -170,7 +171,7 @@ func (cirApp *CirApplication) openSessionFile() {
 	}
 
 	// Load the selected session file
-	newWorkingSession, err := loadWorkingSession(filePath)
+	newWorkingSession, err := storage.LoadWorkingSession(filePath)
 	if err != nil {
 		log.Printf("Error loading session from file: %v\n%v", filePath, err)
 		return
@@ -215,7 +216,7 @@ func (cirApp *CirApplication) Run() error {
 	}
 
 	// Final save before exiting
-	if err := saveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
+	if err := storage.SaveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
 		log.Println("Error saving session:", err)
 	}
 

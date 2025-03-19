@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"log"
@@ -18,14 +18,14 @@ func NewWorkingSession() *types.WorkingSession {
 	}
 }
 
-func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
+func LoadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	log.Println("Loading working session from", sessionFile)
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		log.Println("Session file not found, creating a new one at", sessionFile)
 		sessionFileDir := filepath.Dir(sessionFile)
 		os.MkdirAll(sessionFileDir, 0755)
 		ws := NewWorkingSession()
-		return ws, saveWorkingSession(sessionFile, ws)
+		return ws, SaveWorkingSession(sessionFile, ws)
 	}
 
 	data, err := os.ReadFile(sessionFile)
@@ -42,7 +42,7 @@ func loadWorkingSession(sessionFile string) (*types.WorkingSession, error) {
 	return workingSession, nil
 }
 
-func saveWorkingSession(sessionFile string, workingSession *types.WorkingSession) error {
+func SaveWorkingSession(sessionFile string, workingSession *types.WorkingSession) error {
 	apiVersion := types.CurrentApiVersion
 	workingSession.Kind = "WorkingSession"
 	workingSession.ApiVersion = &apiVersion
