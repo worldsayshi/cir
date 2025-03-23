@@ -223,36 +223,6 @@ func (cirApp *CirApplication) Run() error {
 	return nil
 }
 
-// Update the checksums of the files that were submitted
-// func (cirApp *CirApplication) updateWorkingFileChecksums(filesToSubmit []types.WorkingFile) {
-// 	cirApp.updateState(func(state *AppState) {
-// 		for i, wf := range state.workingSession.WorkingFiles {
-// 			for _, wfSubmit := range filesToSubmit {
-// 				if wf.Path == wfSubmit.Path {
-// 					state.workingSession.WorkingFiles[i] = wfSubmit
-// 				}
-// 			}
-// 		}
-// 	})
-// }
-
-func createSystemMessage() types.Message {
-	systemMessage := types.Message{
-		AiServiceMessage: types.AiServiceMessage{
-			Role: "system",
-			Content: `The assistant is Cir, a conversational AI and a coding assistant.
-Any code or other file content rendered by the assistant should be rendered with markdown
-backticks and should always specify the file path as the comment in the first line of the code block.
-Example:
-` + "```python" + `
-# main.py
-print("Hello, World!")
-` + "```",
-		},
-	}
-	return systemMessage
-}
-
 func (cirApp *CirApplication) handleChatSubmit(text string) {
 	if text == "" {
 		return
@@ -403,4 +373,21 @@ func prepareUserMessage(filesToSubmit []types.WorkingFile, question string) type
 		IncludedWorkingFiles: filesToSubmit,
 	}
 	return userMessage
+}
+
+func createSystemMessage() types.Message {
+	systemMessage := types.Message{
+		AiServiceMessage: types.AiServiceMessage{
+			Role: "system",
+			Content: `The assistant is Cir, a conversational AI and a coding assistant.
+Any code or other file content rendered by the assistant should be rendered with markdown
+backticks and should always specify the file path as the comment in the first line of the code block.
+Example:
+` + "```python" + `
+# main.py
+print("Hello, World!")
+` + "```",
+		},
+	}
+	return systemMessage
 }
