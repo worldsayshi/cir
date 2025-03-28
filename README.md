@@ -39,9 +39,21 @@ go test ./...
 # Backlog
 
 
+## Stream and diff files
+
+- We don't need to stream it with diff, just show the diff once the stream is done.
+- Can even have a toggle for toggling between diff and normal view?
+
+So:
+- Whenever we're in a code section, stop rendering in the history view and stream into some kind of buffer?
+- The buffer can be opened when selecting it somehow.
+- Should the chat history be a list of messages?
+- Pressing enter on an element shows a list of code blocks that can be looked at, and diffed if there's a corresponding file.
+
+
 ## Simpler session selector
 
-HERE!
+Mostly feature complete but some more polish can be applied.
 
 - [/] Find all files that can be opened as sessions and select one
     - Store `kind: WorkingSession` for making it easier to find them
