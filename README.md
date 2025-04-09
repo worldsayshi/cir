@@ -38,6 +38,15 @@ go test ./...
 
 # Backlog
 
+## Better engine?
+
+- Maybe use the [cview fork instead](https://codeberg.org/tslocum/cview)
+    - it seems to have more maintainers and has merged more PR:s
+
+## Styling of chat history
+
+- Make chathistory nicer to read and navigate
+
 
 ## Stream and diff files
 
