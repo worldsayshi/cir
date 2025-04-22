@@ -17,13 +17,6 @@ import (
 	"github.com/worldsayshi/cir/internal/types"
 )
 
-// KeyMapping represents a keyboard shortcut and its associated action
-type KeyMapping struct {
-	Key         tcell.Key
-	Description string
-	Action      func(*CirApplication)
-}
-
 // AppState holds all application state
 type AppState struct {
 	workingSession *types.WorkingSession
@@ -38,8 +31,10 @@ type CirApplication struct {
 	chatHistory   *components.ChatHistory
 	inputArea     *components.InputArea
 	contextBar    *components.ContextBar
+	helpPopup     *components.HelpPopup
 	rootContainer *tview.Flex
-	keyMappings   []KeyMapping
+	keyMappings   []types.KeyMapping
+	pages         *tview.Pages
 }
 
 func NewCirApplication(sessionFile string) *CirApplication {
@@ -60,15 +55,31 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	chatHistory := components.NewChatHistory(nil) // Will be populated during render
 	contextBar := components.NewContextBar(nil)   // Will be populated during render
 	inputArea := components.NewInputArea()
+	pages := tview.NewPages()
 
 	cirApp := &CirApplication{
-		Application:   tview.NewApplication(),
-		state:         state,
-		chatHistory:   chatHistory,
-		inputArea:     inputArea,
-		contextBar:    contextBar,
+		Application: tview.NewApplication(),
+		state:       state,
+		chatHistory: chatHistory,
+		inputArea:   inputArea,
+		contextBar:  contextBar,
+		// helpPopup:     helpPopup,
 		rootContainer: tview.NewFlex().SetDirection(tview.FlexRow),
+		pages:         pages,
 	}
+
+	// Define key mappings
+	cirApp.keyMappings = createKeyMappings(cirApp)
+	cirApp.helpPopup = components.NewHelpPopup(
+		cirApp.keyMappings,
+		cirApp.pages.HasPage,
+		func(name string, item tview.Primitive, resize, visible bool) {
+			cirApp.pages.AddPage(name, item, resize, visible)
+		},
+		func(name string) {
+			cirApp.pages.RemovePage(name)
+		},
+	)
 
 	// Set up UI event handlers
 	inputArea.SetChangedFunc(func() {
@@ -80,45 +91,21 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	inputArea.SetSubmitFunc(cirApp.handleChatSubmit)
 
-	// Define key mappings
-	cirApp.keyMappings = []KeyMapping{
-		{
-			Key:         tcell.KeyTab,
-			Description: "Cycle focus forward",
-			Action: func(app *CirApplication) {
-				focusableElements := []tview.Primitive{app.chatHistory, app.inputArea}
-				app.cycleFocus(focusableElements, false)
-			},
-		},
-		{
-			Key:         tcell.KeyBacktab,
-			Description: "Cycle focus backward",
-			Action: func(app *CirApplication) {
-				focusableElements := []tview.Primitive{app.chatHistory, app.inputArea}
-				app.cycleFocus(focusableElements, true)
-			},
-		},
-		{
-			Key:         tcell.KeyCtrlE,
-			Description: "Open session file",
-			Action: func(app *CirApplication) {
-				app.openSessionFile()
-			},
-		},
-		{
-			Key:         tcell.KeyCtrlY,
-			Description: "Edit context files",
-			Action: func(app *CirApplication) {
-				app.editContextFiles()
-			},
-		},
-	}
-
 	// Setup keyboard handlers
 	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Special case for the '?' key since it's a rune, not a special key
+		if event.Key() == tcell.KeyRune && event.Rune() == '?' {
+			log.Println("Special case")
+			cirApp.helpPopup.ShowHelpPopup()
+			return nil
+		}
+
 		for _, mapping := range cirApp.keyMappings {
 			if event.Key() == mapping.Key {
-				mapping.Action(cirApp)
+				log.Println("Key pressed:",
+					components.GetKeyName(event.Key()), "Action:", mapping.Description,
+				)
+				mapping.Action()
 				return nil
 			}
 		}
@@ -129,6 +116,49 @@ func NewCirApplication(sessionFile string) *CirApplication {
 	cirApp.render()
 
 	return cirApp
+}
+
+func createKeyMappings(cirApp *CirApplication) []types.KeyMapping {
+	return []types.KeyMapping{
+		{
+			Key:         tcell.KeyTab,
+			Description: "Cycle focus forward",
+			Action: func() {
+				focusableElements := []tview.Primitive{cirApp.chatHistory, cirApp.inputArea}
+				cirApp.cycleFocus(focusableElements, false)
+			},
+		},
+		{
+			Key:         tcell.KeyBacktab,
+			Description: "Cycle focus backward",
+			Action: func() {
+				focusableElements := []tview.Primitive{cirApp.chatHistory, cirApp.inputArea}
+				cirApp.cycleFocus(focusableElements, true)
+			},
+		},
+		{
+			Key:         tcell.KeyCtrlE,
+			Description: "Open session file",
+			Action: func() {
+				cirApp.openSessionFile()
+			},
+		},
+		{
+			Key:         tcell.KeyCtrlY,
+			Description: "Edit context files",
+			Action: func() {
+				cirApp.editContextFiles()
+			},
+		},
+		// {
+		// 	Key:         tcell.KeyRune,
+		// 	Description: "Show help",
+		// 	Action: func() {
+		// 		log.Println("Show help")
+		// 		cirApp.helpPopup.ShowHelpPopup()
+		// 	},
+		// },
+	}
 }
 
 // updateState applies a state change function and triggers a UI update
@@ -160,9 +190,16 @@ func (cirApp *CirApplication) render() {
 			AddItem(cirApp.contextBar, 0, 1, false).
 			AddItem(cirApp.inputArea, 0, 2, true)
 
-		cirApp.SetRoot(cirApp.rootContainer, true)
+		// Add the main UI to the pages
+		cirApp.pages.AddPage("main", cirApp.rootContainer, true, true)
+		cirApp.SetRoot(cirApp.pages, true)
 		cirApp.SetFocus(cirApp.inputArea)
 	}
+}
+
+// Pages returns the application's pages component
+func (cirApp *CirApplication) Pages() *tview.Pages {
+	return cirApp.pages
 }
 
 // From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
@@ -426,6 +463,6 @@ print("Hello, World!")
 }
 
 // GetKeyMappings returns the application's key mappings
-func (cirApp *CirApplication) GetKeyMappings() []KeyMapping {
-	return cirApp.keyMappings
-}
+// func (cirApp *CirApplication) GetKeyMappings() []KeyMapping {
+// 	return cirApp.keyMappings
+// }
