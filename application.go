@@ -17,6 +17,13 @@ import (
 	"github.com/worldsayshi/cir/internal/types"
 )
 
+// KeyMapping represents a keyboard shortcut and its associated action
+type KeyMapping struct {
+	Key         tcell.Key
+	Description string
+	Action      func(*CirApplication)
+}
+
 // AppState holds all application state
 type AppState struct {
 	workingSession *types.WorkingSession
@@ -32,6 +39,7 @@ type CirApplication struct {
 	inputArea     *components.InputArea
 	contextBar    *components.ContextBar
 	rootContainer *tview.Flex
+	keyMappings   []KeyMapping
 }
 
 func NewCirApplication(sessionFile string) *CirApplication {
@@ -72,22 +80,47 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	inputArea.SetSubmitFunc(cirApp.handleChatSubmit)
 
+	// Define key mappings
+	cirApp.keyMappings = []KeyMapping{
+		{
+			Key:         tcell.KeyTab,
+			Description: "Cycle focus forward",
+			Action: func(app *CirApplication) {
+				focusableElements := []tview.Primitive{app.chatHistory, app.inputArea}
+				app.cycleFocus(focusableElements, false)
+			},
+		},
+		{
+			Key:         tcell.KeyBacktab,
+			Description: "Cycle focus backward",
+			Action: func(app *CirApplication) {
+				focusableElements := []tview.Primitive{app.chatHistory, app.inputArea}
+				app.cycleFocus(focusableElements, true)
+			},
+		},
+		{
+			Key:         tcell.KeyCtrlE,
+			Description: "Open session file",
+			Action: func(app *CirApplication) {
+				app.openSessionFile()
+			},
+		},
+		{
+			Key:         tcell.KeyCtrlY,
+			Description: "Edit context files",
+			Action: func(app *CirApplication) {
+				app.editContextFiles()
+			},
+		},
+	}
+
 	// Setup keyboard handlers
-	focusableElements := []tview.Primitive{chatHistory, inputArea}
 	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Key() {
-		case tcell.KeyTab:
-			cirApp.cycleFocus(focusableElements, false)
-			return nil
-		case tcell.KeyBacktab:
-			cirApp.cycleFocus(focusableElements, true)
-			return nil
-		case tcell.KeyCtrlE:
-			cirApp.openSessionFile()
-			return nil
-		case tcell.KeyCtrlY:
-			cirApp.editContextFiles()
-			return nil
+		for _, mapping := range cirApp.keyMappings {
+			if event.Key() == mapping.Key {
+				mapping.Action(cirApp)
+				return nil
+			}
 		}
 		return event
 	})
@@ -390,4 +423,9 @@ print("Hello, World!")
 		},
 	}
 	return systemMessage
+}
+
+// GetKeyMappings returns the application's key mappings
+func (cirApp *CirApplication) GetKeyMappings() []KeyMapping {
+	return cirApp.keyMappings
 }
