@@ -99,6 +99,10 @@ func NewCirApplication(sessionFile string) *CirApplication {
 			cirApp.helpPopup.ShowHelpPopup()
 			return nil
 		}
+		// If the help popup is open, for now, any key press should close it
+		if cirApp.pages.HasPage("help") {
+			cirApp.pages.RemovePage("help")
+		}
 
 		for _, mapping := range cirApp.keyMappings {
 			if event.Key() == mapping.Key {
