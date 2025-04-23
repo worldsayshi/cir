@@ -164,14 +164,11 @@ func (cirApp *CirApplication) render() {
 	isProcessing := cirApp.appState.IsCurrentlyProcessing()
 
 	// Update UI components with current state
-	// These methods should not trigger state changes
 	cirApp.chatHistory.Render(workingSession.Messages)
 	cirApp.contextBar.Render(workingSession.WorkingFiles)
 
-	// This might be causing issues if the SetText is triggering a change event
-	// that updates state, resulting in an infinite loop
+	// Only update if the text actually changed to prevent loops
 	if cirApp.inputArea.GetText() != workingSession.InputText {
-		// Only update if the text actually changed to prevent loops
 		cirApp.inputArea.SetText(workingSession.InputText, false)
 	}
 
@@ -218,6 +215,7 @@ func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse boo
 	}
 }
 
+// openSessionFile loads a new session file and updates the app state
 func (cirApp *CirApplication) openSessionFile() {
 	sessionFindingCommand := `(dir=$(pwd); while [ "$dir" != "/" ]; do find "$dir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; if [ -d "$dir/.cir" ]; then find "$dir/.cir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; fi; dir=$(dirname "$dir"); done)`
 	tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m`
@@ -283,8 +281,7 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 
 	cirApp.appState.Update(func(s *state.AppState) {
 		// Initialize with system message if needed
-		messages := s.GetMessages()
-		if len(messages) == 0 {
+		if len(s.GetMessages()) == 0 {
 			s.AddMessage(createSystemMessage())
 		}
 

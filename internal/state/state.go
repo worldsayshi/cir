@@ -17,7 +17,7 @@ type AppState struct {
 	isProcessing   bool
 	subscribers    []func()
 	updating       atomic.Bool // Flag to prevent recursive updates
-	inUpdateFunc   atomic.Bool // Flag indicating we're inside an Update call
+	muteCallbacks  bool        // Flag to temporarily mute callbacks during batch updates
 }
 
 // NewAppState creates a new AppState with the given working session
@@ -27,6 +27,7 @@ func NewAppState(workingSession *types.WorkingSession, sessionFile string) *AppS
 		sessionFile:    sessionFile,
 		isProcessing:   false,
 		subscribers:    []func(){},
+		muteCallbacks:  false,
 	}
 }
 
@@ -36,16 +37,18 @@ func (a *AppState) Update(updateFunc func(*AppState)) {
 	// If we're already inside an update, don't trigger subscribers again
 	isAlreadyUpdating := a.updating.Swap(true)
 
-	// Set the inUpdateFunc flag to true so setters know they're being called from inside Update
-	wasInUpdateFunc := a.inUpdateFunc.Swap(true)
-
-	// Apply the update under lock
+	// Apply the update - inside here we're under the mutex's protection
 	a.mu.Lock()
-	updateFunc(a)
-	a.mu.Unlock()
+	// Keep track of previous mute state and set to true during update
+	previousMute := a.muteCallbacks
+	a.muteCallbacks = true
 
-	// Restore the inUpdateFunc flag
-	a.inUpdateFunc.Store(wasInUpdateFunc)
+	// Call the update function while under mutex protection
+	updateFunc(a)
+
+	// Restore mute state
+	a.muteCallbacks = previousMute
+	a.mu.Unlock()
 
 	// Only notify subscribers if this is the outermost update call
 	if !isAlreadyUpdating {
@@ -59,11 +62,6 @@ func (a *AppState) Update(updateFunc func(*AppState)) {
 	}
 }
 
-// Internal helper to check if we're in an update function
-func (a *AppState) isInUpdate() bool {
-	return a.inUpdateFunc.Load()
-}
-
 // GetWorkingSession returns the working session
 func (a *AppState) GetWorkingSession() *types.WorkingSession {
 	a.mu.RLock()
@@ -73,13 +71,14 @@ func (a *AppState) GetWorkingSession() *types.WorkingSession {
 
 // SetWorkingSession sets the working session
 func (a *AppState) SetWorkingSession(ws *types.WorkingSession) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.workingSession = ws
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.workingSession = ws
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.workingSession = ws
+		})
 	}
 }
 
@@ -92,13 +91,14 @@ func (a *AppState) GetSessionFile() string {
 
 // SetSessionFile sets the session file path
 func (a *AppState) SetSessionFile(path string) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.sessionFile = path
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.sessionFile = path
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.sessionFile = path
+		})
 	}
 }
 
@@ -111,13 +111,14 @@ func (a *AppState) IsCurrentlyProcessing() bool {
 
 // SetIsProcessing sets the processing state
 func (a *AppState) SetIsProcessing(isProcessing bool) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.isProcessing = isProcessing
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.isProcessing = isProcessing
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.isProcessing = isProcessing
+		})
 	}
 }
 
@@ -130,43 +131,46 @@ func (a *AppState) GetMessages() []types.Message {
 
 // AddMessage adds a message to the working session
 func (a *AppState) AddMessage(message types.Message) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.workingSession.Messages = append(a.workingSession.Messages, message)
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.workingSession.Messages = append(a.workingSession.Messages, message)
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.workingSession.Messages = append(s.workingSession.Messages, message)
+		})
 	}
 }
 
 // UpdateLastMessage updates the last message in the working session
 func (a *AppState) UpdateLastMessage(content string) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		lastIdx := len(a.workingSession.Messages) - 1
 		if lastIdx >= 0 {
 			a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
 		}
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		lastIdx := len(a.workingSession.Messages) - 1
-		if lastIdx >= 0 {
-			a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
-		}
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			lastIdx := len(s.workingSession.Messages) - 1
+			if lastIdx >= 0 {
+				s.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
+			}
+		})
 	}
 }
 
 // SetInputText sets the input text in the working session
 func (a *AppState) SetInputText(text string) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.workingSession.InputText = text
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.workingSession.InputText = text
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.workingSession.InputText = text
+		})
 	}
 }
 
@@ -179,13 +183,14 @@ func (a *AppState) GetInputText() string {
 
 // SetWorkingFiles sets the working files in the working session
 func (a *AppState) SetWorkingFiles(files []types.WorkingFile) {
-	if a.isInUpdate() {
-		// If called from within Update, we don't need to lock
+	if a.muteCallbacks {
+		// If callbacks are muted, we're inside an Update call and already have the mutex
 		a.workingSession.WorkingFiles = files
 	} else {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		a.workingSession.WorkingFiles = files
+		// Otherwise acquire the mutex and trigger an update
+		a.Update(func(s *AppState) {
+			s.workingSession.WorkingFiles = files
+		})
 	}
 }
 
