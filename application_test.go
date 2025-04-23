@@ -41,7 +41,7 @@ working_files:
 
 	// Prepare user message
 	question := "What is the content of the test file?"
-	filesToSubmit := getFilesToSubmitWithChecksums(app.state.workingSession.WorkingFiles)
+	filesToSubmit := getFilesToSubmitWithChecksums(app.appState.GetWorkingFiles())
 	userMessage := prepareUserMessage(filesToSubmit, question)
 
 	// Check if the user message contains the expected content
@@ -51,7 +51,7 @@ This is a test file.
 <question>
 What is the content of the test file?
 </question>`
-	if userMessage.Content != expectedContent {
-		t.Errorf("Expected user message to be:\n%s\nBut got:\n%s", expectedContent, userMessage.Content)
+	if userMessage.AiServiceMessage.Content != expectedContent {
+		t.Errorf("Expected user message to be:\n%s\nBut got:\n%s", expectedContent, userMessage.AiServiceMessage.Content)
 	}
 }
