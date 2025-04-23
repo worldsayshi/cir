@@ -24,10 +24,11 @@ func NewInputArea() *InputArea {
 // SetChangedFunc overrides the standard tview changed function to prevent
 // infinite loops during programmatic updates
 func (input *InputArea) SetChangedFunc(handler func()) {
+	originalChangedHandler := handler
 	input.TextArea.SetChangedFunc(func() {
 		// Only trigger external changes if this is not an internal update
 		if !input.isInternalUpdate.Load() {
-			handler()
+			originalChangedHandler()
 		}
 	})
 }
@@ -46,12 +47,22 @@ func (input *InputArea) SetText(text string, emitChange bool) {
 
 // Ctrl+S to submit
 func (input *InputArea) SetSubmitFunc(submitFunc func(text string)) {
+	originalCapture := input.GetInputCapture()
+
 	input.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Handle submission with Ctrl+S
 		if event.Key() == tcell.KeyCtrlS {
 			text := input.GetText()
 			submitFunc(text)
 			return nil
 		}
+
+		// Pass all other keys to the original handler, if any
+		if originalCapture != nil {
+			return originalCapture(event)
+		}
+
+		// Otherwise pass through all other keys
 		return event
 	})
 }

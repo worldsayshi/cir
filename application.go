@@ -88,17 +88,19 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	// Setup keyboard handlers
 	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// Special case for the '?' key since it's a rune, not a special key
+		// If the help popup is open, any key press should close it
+		if cirApp.pages.HasPage("help") {
+			cirApp.pages.RemovePage("help")
+			return nil
+		}
+
+		// Special case for the '?' key
 		if event.Key() == tcell.KeyRune && event.Rune() == '?' {
-			log.Println("Special case")
 			cirApp.helpPopup.ShowHelpPopup()
 			return nil
 		}
-		// If the help popup is open, for now, any key press should close it
-		if cirApp.pages.HasPage("help") {
-			cirApp.pages.RemovePage("help")
-		}
 
+		// Check for specific key mappings (Tab, Ctrl+E, etc.)
 		for _, mapping := range cirApp.keyMappings {
 			if event.Key() == mapping.Key {
 				log.Println("Key pressed:",
@@ -108,6 +110,8 @@ func NewCirApplication(sessionFile string) *CirApplication {
 				return nil
 			}
 		}
+
+		// Let all other keys pass through to the focused primitive
 		return event
 	})
 

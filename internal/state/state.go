@@ -17,6 +17,7 @@ type AppState struct {
 	isProcessing   bool
 	subscribers    []func()
 	updating       atomic.Bool // Flag to prevent recursive updates
+	inUpdateFunc   atomic.Bool // Flag indicating we're inside an Update call
 }
 
 // NewAppState creates a new AppState with the given working session
@@ -35,10 +36,16 @@ func (a *AppState) Update(updateFunc func(*AppState)) {
 	// If we're already inside an update, don't trigger subscribers again
 	isAlreadyUpdating := a.updating.Swap(true)
 
+	// Set the inUpdateFunc flag to true so setters know they're being called from inside Update
+	wasInUpdateFunc := a.inUpdateFunc.Swap(true)
+
 	// Apply the update under lock
 	a.mu.Lock()
 	updateFunc(a)
 	a.mu.Unlock()
+
+	// Restore the inUpdateFunc flag
+	a.inUpdateFunc.Store(wasInUpdateFunc)
 
 	// Only notify subscribers if this is the outermost update call
 	if !isAlreadyUpdating {
@@ -52,6 +59,11 @@ func (a *AppState) Update(updateFunc func(*AppState)) {
 	}
 }
 
+// Internal helper to check if we're in an update function
+func (a *AppState) isInUpdate() bool {
+	return a.inUpdateFunc.Load()
+}
+
 // GetWorkingSession returns the working session
 func (a *AppState) GetWorkingSession() *types.WorkingSession {
 	a.mu.RLock()
@@ -61,9 +73,14 @@ func (a *AppState) GetWorkingSession() *types.WorkingSession {
 
 // SetWorkingSession sets the working session
 func (a *AppState) SetWorkingSession(ws *types.WorkingSession) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.workingSession = ws
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.workingSession = ws
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.workingSession = ws
+	}
 }
 
 // GetSessionFile returns the session file path
@@ -75,9 +92,14 @@ func (a *AppState) GetSessionFile() string {
 
 // SetSessionFile sets the session file path
 func (a *AppState) SetSessionFile(path string) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.sessionFile = path
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.sessionFile = path
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.sessionFile = path
+	}
 }
 
 // IsCurrentlyProcessing returns whether the application is currently processing a request
@@ -89,9 +111,14 @@ func (a *AppState) IsCurrentlyProcessing() bool {
 
 // SetIsProcessing sets the processing state
 func (a *AppState) SetIsProcessing(isProcessing bool) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.isProcessing = isProcessing
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.isProcessing = isProcessing
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.isProcessing = isProcessing
+	}
 }
 
 // GetMessages returns the messages from the working session
@@ -103,26 +130,44 @@ func (a *AppState) GetMessages() []types.Message {
 
 // AddMessage adds a message to the working session
 func (a *AppState) AddMessage(message types.Message) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.workingSession.Messages = append(a.workingSession.Messages, message)
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.workingSession.Messages = append(a.workingSession.Messages, message)
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.workingSession.Messages = append(a.workingSession.Messages, message)
+	}
 }
 
 // UpdateLastMessage updates the last message in the working session
 func (a *AppState) UpdateLastMessage(content string) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	lastIdx := len(a.workingSession.Messages) - 1
-	if lastIdx >= 0 {
-		a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		lastIdx := len(a.workingSession.Messages) - 1
+		if lastIdx >= 0 {
+			a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
+		}
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		lastIdx := len(a.workingSession.Messages) - 1
+		if lastIdx >= 0 {
+			a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
+		}
 	}
 }
 
 // SetInputText sets the input text in the working session
 func (a *AppState) SetInputText(text string) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.workingSession.InputText = text
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.workingSession.InputText = text
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.workingSession.InputText = text
+	}
 }
 
 // GetInputText gets the input text from the working session
@@ -134,9 +179,14 @@ func (a *AppState) GetInputText() string {
 
 // SetWorkingFiles sets the working files in the working session
 func (a *AppState) SetWorkingFiles(files []types.WorkingFile) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	a.workingSession.WorkingFiles = files
+	if a.isInUpdate() {
+		// If called from within Update, we don't need to lock
+		a.workingSession.WorkingFiles = files
+	} else {
+		a.mu.Lock()
+		defer a.mu.Unlock()
+		a.workingSession.WorkingFiles = files
+	}
 }
 
 // GetWorkingFiles gets the working files from the working session
