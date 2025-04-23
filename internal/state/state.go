@@ -1,94 +1,172 @@
 package state
 
 import (
+	"log"
 	"sync"
+	"sync/atomic"
 
+	"github.com/worldsayshi/cir/internal/storage"
 	"github.com/worldsayshi/cir/internal/types"
 )
 
-/*
-	Optional example of how state can be managed!
-*/
-
-// AppState holds all application state
+// AppState holds the application state and manages subscriptions
 type AppState struct {
-	WorkingSession *types.WorkingSession
-	SessionFile    string
-	IsProcessing   bool
-
-	mu          sync.RWMutex
-	subscribers []func()
+	mu             sync.RWMutex
+	workingSession *types.WorkingSession
+	sessionFile    string
+	isProcessing   bool
+	subscribers    []func()
+	updating       atomic.Bool // Flag to prevent recursive updates
 }
 
-// NewAppState creates a new application state
+// NewAppState creates a new AppState with the given working session
 func NewAppState(workingSession *types.WorkingSession, sessionFile string) *AppState {
 	return &AppState{
-		WorkingSession: workingSession,
-		SessionFile:    sessionFile,
-		IsProcessing:   false,
-		subscribers:    make([]func(), 0),
+		workingSession: workingSession,
+		sessionFile:    sessionFile,
+		isProcessing:   false,
+		subscribers:    []func(){},
 	}
 }
 
-// Update modifies the state with the provided update function and notifies subscribers
-func (s *AppState) Update(updateFunc func(*AppState)) {
-	s.mu.Lock()
-	updateFunc(s)
-	s.mu.Unlock()
+// Update applies a state change function in a thread-safe manner
+// and notifies all subscribers of the change
+func (a *AppState) Update(updateFunc func(*AppState)) {
+	// If we're already inside an update, don't trigger subscribers again
+	isAlreadyUpdating := a.updating.Swap(true)
 
-	s.notifySubscribers()
-}
+	// Apply the update under lock
+	a.mu.Lock()
+	updateFunc(a)
+	a.mu.Unlock()
 
-// Subscribe adds a listener that will be called when state changes
-func (s *AppState) Subscribe(callback func()) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.subscribers = append(s.subscribers, callback)
-}
-
-// Unsubscribe removes a listener
-func (s *AppState) Unsubscribe(callback func()) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for i, cb := range s.subscribers {
-		if &cb == &callback {
-			s.subscribers = append(s.subscribers[:i], s.subscribers[i+1:]...)
-			break
+	// Only notify subscribers if this is the outermost update call
+	if !isAlreadyUpdating {
+		// Call subscribers
+		for _, subscriber := range a.subscribers {
+			subscriber()
 		}
+
+		// Reset the updating flag
+		a.updating.Store(false)
 	}
 }
 
-// notifySubscribers calls all subscribed listeners
-func (s *AppState) notifySubscribers() {
-	s.mu.RLock()
-	subscribers := make([]func(), len(s.subscribers))
-	copy(subscribers, s.subscribers)
-	s.mu.RUnlock()
+// GetWorkingSession returns the working session
+func (a *AppState) GetWorkingSession() *types.WorkingSession {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.workingSession
+}
 
-	for _, callback := range subscribers {
-		callback()
+// SetWorkingSession sets the working session
+func (a *AppState) SetWorkingSession(ws *types.WorkingSession) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.workingSession = ws
+}
+
+// GetSessionFile returns the session file path
+func (a *AppState) GetSessionFile() string {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.sessionFile
+}
+
+// SetSessionFile sets the session file path
+func (a *AppState) SetSessionFile(path string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.sessionFile = path
+}
+
+// IsCurrentlyProcessing returns whether the application is currently processing a request
+func (a *AppState) IsCurrentlyProcessing() bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.isProcessing
+}
+
+// SetIsProcessing sets the processing state
+func (a *AppState) SetIsProcessing(isProcessing bool) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.isProcessing = isProcessing
+}
+
+// GetMessages returns the messages from the working session
+func (a *AppState) GetMessages() []types.Message {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.workingSession.Messages
+}
+
+// AddMessage adds a message to the working session
+func (a *AppState) AddMessage(message types.Message) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.workingSession.Messages = append(a.workingSession.Messages, message)
+}
+
+// UpdateLastMessage updates the last message in the working session
+func (a *AppState) UpdateLastMessage(content string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	lastIdx := len(a.workingSession.Messages) - 1
+	if lastIdx >= 0 {
+		a.workingSession.Messages[lastIdx].AiServiceMessage.Content = content
 	}
 }
 
-// GetWorkingSession returns the working session (thread-safe)
-func (s *AppState) GetWorkingSession() *types.WorkingSession {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.WorkingSession
+// SetInputText sets the input text in the working session
+func (a *AppState) SetInputText(text string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.workingSession.InputText = text
 }
 
-// GetSessionFile returns the session file path (thread-safe)
-func (s *AppState) GetSessionFile() string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.SessionFile
+// GetInputText gets the input text from the working session
+func (a *AppState) GetInputText() string {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.workingSession.InputText
 }
 
-// IsCurrentlyProcessing checks if the application is processing a request (thread-safe)
-func (s *AppState) IsCurrentlyProcessing() bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.IsProcessing
+// SetWorkingFiles sets the working files in the working session
+func (a *AppState) SetWorkingFiles(files []types.WorkingFile) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.workingSession.WorkingFiles = files
+}
+
+// GetWorkingFiles gets the working files from the working session
+func (a *AppState) GetWorkingFiles() []types.WorkingFile {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.workingSession.WorkingFiles
+}
+
+// Subscribe adds a subscriber function that will be called when state changes
+func (a *AppState) Subscribe(subscriber func()) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.subscribers = append(a.subscribers, subscriber)
+}
+
+// AddPersistenceSubscriber adds a subscriber that persists the state to disk
+// whenever state changes occur
+func (a *AppState) AddPersistenceSubscriber() {
+	a.Subscribe(func() {
+		// Thread-safe access to state
+		a.mu.RLock()
+		sessionFile := a.sessionFile
+		workingSession := a.workingSession
+		a.mu.RUnlock()
+
+		// Save state to disk without triggering additional updates
+		err := storage.SaveWorkingSession(sessionFile, workingSession)
+		if err != nil {
+			log.Printf("Error saving session: %v", err)
+		}
+	})
 }
