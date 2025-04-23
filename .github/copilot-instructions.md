@@ -2,6 +2,8 @@
 
 ## Core Principles
 
+0. **Simplicity**: A code change that makes the code harder to read always needs to be justified by adding some other user or clear development value.
+
 1. **Single Source of Truth**: Maintain all application state in `AppState`. Never store state in individual components that should be shared.
 
 2. **State Changes Through `updateState` Only**: All state mutations should flow through the `updateState` function to ensure consistent state transitions and automatic persistence.
