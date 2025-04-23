@@ -76,8 +76,8 @@ func NewCirApplication(sessionFile string) *CirApplication {
 
 	// Set up UI event handlers
 	inputArea.SetChangedFunc(func() {
-		appState.Update(func(s *state.AppState) {
-			s.SetInputText(inputArea.GetText())
+		appState.Update(func(data *state.StateData) {
+			data.WorkingSession.InputText = inputArea.GetText()
 		})
 	})
 
@@ -240,9 +240,9 @@ func (cirApp *CirApplication) openSessionFile() {
 	}
 
 	// Update state with new session
-	cirApp.appState.Update(func(s *state.AppState) {
-		s.SetWorkingSession(newWorkingSession)
-		s.SetSessionFile(filePath)
+	cirApp.appState.Update(func(data *state.StateData) {
+		data.WorkingSession = newWorkingSession
+		data.SessionFile = filePath
 	})
 }
 
@@ -265,8 +265,8 @@ func (cirApp *CirApplication) editContextFiles() {
 		}
 	}
 
-	cirApp.appState.Update(func(s *state.AppState) {
-		s.SetWorkingFiles(selectedWorkingFiles)
+	cirApp.appState.Update(func(data *state.StateData) {
+		data.WorkingSession.WorkingFiles = selectedWorkingFiles
 	})
 }
 
@@ -279,22 +279,25 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 		return
 	}
 
-	cirApp.appState.Update(func(s *state.AppState) {
+	cirApp.appState.Update(func(data *state.StateData) {
 		// Initialize with system message if needed
-		if len(s.GetMessages()) == 0 {
-			s.AddMessage(createSystemMessage())
+		if len(data.WorkingSession.Messages) == 0 {
+			data.WorkingSession.Messages = append(data.WorkingSession.Messages,
+				createSystemMessage())
 		}
 
-		workingFiles := s.GetWorkingFiles()
-		filesToSubmit := getFilesToSubmitWithChecksums(workingFiles)
+		// Get checksums without risking deadlocks, all within the update function
+		filesToSubmit := getFilesToSubmitWithChecksums(data.WorkingSession.WorkingFiles)
 		userMessage := prepareUserMessage(filesToSubmit, text)
 
 		// Add user message
-		s.AddMessage(userMessage)
+		data.WorkingSession.Messages = append(
+			data.WorkingSession.Messages, userMessage,
+		)
 
 		// Update file checksums
-		updatedWorkingFiles := make([]types.WorkingFile, len(workingFiles))
-		copy(updatedWorkingFiles, workingFiles)
+		updatedWorkingFiles := make([]types.WorkingFile, len(data.WorkingSession.WorkingFiles))
+		copy(updatedWorkingFiles, data.WorkingSession.WorkingFiles)
 
 		for i, wf := range updatedWorkingFiles {
 			for _, wfSubmit := range filesToSubmit {
@@ -303,16 +306,19 @@ func (cirApp *CirApplication) handleChatSubmit(text string) {
 				}
 			}
 		}
-		s.SetWorkingFiles(updatedWorkingFiles)
+		data.WorkingSession.WorkingFiles = updatedWorkingFiles
 
 		// Clear input and set processing state
-		s.SetInputText("")
-		s.SetIsProcessing(true)
+		data.WorkingSession.InputText = ""
+		data.IsProcessing = true
 
 		// Add empty message for streaming response
-		s.AddMessage(types.Message{
-			AiServiceMessage: types.AiServiceMessage{Role: "assistant", Content: ""},
-		})
+		data.WorkingSession.Messages = append(
+			data.WorkingSession.Messages,
+			types.Message{
+				AiServiceMessage: types.AiServiceMessage{Role: "assistant", Content: ""},
+			},
+		)
 	})
 
 	// Get service messages for API call
@@ -333,24 +339,30 @@ func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errCh
 		case chunk, ok := <-resultChan:
 			if !ok {
 				// Stream completed
-				cirApp.appState.Update(func(s *state.AppState) {
-					s.SetIsProcessing(false)
+				cirApp.appState.Update(func(data *state.StateData) {
+					data.IsProcessing = false
 				})
 				return
 			}
 
 			accumulated += chunk
 
-			cirApp.appState.Update(func(s *state.AppState) {
-				s.UpdateLastMessage(accumulated)
+			cirApp.appState.Update(func(data *state.StateData) {
+				lastIdx := len(data.WorkingSession.Messages) - 1
+				if lastIdx >= 0 {
+					data.WorkingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
+				}
 			})
 
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
-				cirApp.appState.Update(func(s *state.AppState) {
-					s.UpdateLastMessage(fmt.Sprintf("Error: %v", err))
-					s.SetIsProcessing(false)
+				cirApp.appState.Update(func(data *state.StateData) {
+					lastIdx := len(data.WorkingSession.Messages) - 1
+					if lastIdx >= 0 {
+						data.WorkingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
+					}
+					data.IsProcessing = false
 				})
 				return
 			}
