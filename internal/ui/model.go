@@ -190,11 +190,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 		// Resize chat history viewport
-		m.chatHistory.Width = msg.Width - 2
+		m.chatHistory.Width = msg.Width + 2
 		m.chatHistory.Height = msg.Height - 10
 
 		// Resize input area
 		m.inputArea.SetWidth(msg.Width - 2)
+
+		// Re-render chat history with the new width to ensure text wrapping
+		m.UpdateChatHistory()
 
 		return m, nil
 
