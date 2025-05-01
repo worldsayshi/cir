@@ -215,11 +215,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 		// Resize chat history viewport - make it larger when not in insert mode
-		m.chatHistory.Width = msg.Width - 2
+		m.chatHistory.Width = msg.Width
 		if m.insertMode {
-			m.chatHistory.Height = msg.Height - 10 // Smaller when input is visible
+			m.chatHistory.Height = msg.Height - (m.inputArea.Height() + 8) // Smaller when input is visible
 		} else {
-			m.chatHistory.Height = msg.Height - 3 // Larger when in normal mode
+			m.chatHistory.Height = msg.Height - 6 // Larger when in normal mode
 		}
 
 		// Resize input area
