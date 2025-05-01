@@ -41,7 +41,7 @@ working_files:
 
 	// Prepare user message
 	question := "What is the content of the test file?"
-	filesToSubmit := getFilesToSubmitWithChecksums(app.appState.GetWorkingFiles())
+	filesToSubmit := getFilesToSubmitWithChecksums(app.appState.UnsafeGetState().WorkingSession.WorkingFiles)
 	userMessage := prepareUserMessage(filesToSubmit, question)
 
 	// Check if the user message contains the expected content

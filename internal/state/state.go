@@ -105,3 +105,11 @@ func (a *AppState) AddPersistenceSubscriber() {
 		}
 	})
 }
+
+// Might cause deadlock if not careful
+// This should only be used for testing or debugging
+func (a *AppState) UnsafeGetState() *StateData {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return &a.data
+}
