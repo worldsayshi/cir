@@ -95,7 +95,9 @@ func (m *Model) UpdateChatHistory() {
 		return
 	}
 
-	content := formatChatHistory(m.state.WorkingSession.Messages)
+	// Use the current width for proper text wrapping
+	width := m.chatHistory.Width
+	content := formatChatHistory(m.state.WorkingSession.Messages, width)
 	m.chatHistory.SetContent(content)
 	m.chatHistory.GotoBottom()
 }
