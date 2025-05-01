@@ -17,15 +17,19 @@ func (m helpModel) View() string {
 	content := `
   CIR KEYBOARD SHORTCUTS
 
+  Normal Mode:
+  i : Enter insert mode
   ? : Show/hide this help
-  tab : Toggle between chat history and input
-  ctrl+s : Submit message
   ctrl+e : Open session file
   ctrl+y : Edit context files
-  ctrl+c, q : Quit
+  j/k, ↑/↓ : Scroll chat history up/down
 
-  Chat History Navigation:
-  ↑/↓ : Scroll up/down when focused
+  Insert Mode:
+  esc : Return to normal mode
+  ctrl+s : Submit message and return to normal mode
+
+  Global:
+  ctrl+c, q : Quit
 
   Press any key to close help
 `

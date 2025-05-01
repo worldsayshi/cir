@@ -17,6 +17,7 @@ type Model struct {
 	activeElement ActiveElement
 	help          helpModel
 	showHelp      bool
+	insertMode    bool // Flag to track if we're in insert mode
 
 	// UI Components
 	chatHistory viewport.Model
@@ -61,7 +62,7 @@ func NewModel(state *AppState) Model {
 	ta.ShowLineNumbers = false
 	ta.SetWidth(80)
 	ta.SetHeight(4)
-	ta.Focus() // Make sure the textarea is focused from the start
+	ta.Blur() // Initially blurred since we're starting in normal mode
 
 	// Set up the chat history viewport
 	vp := viewport.New(80, 20)
@@ -75,12 +76,13 @@ func NewModel(state *AppState) Model {
 
 	return Model{
 		state:         state,
-		activeElement: InputAreaElement,
+		activeElement: ChatHistoryElement, // Start with focus on chat history
 		chatHistory:   vp,
 		inputArea:     ta,
 		statusBar:     statusBar,
 		help:          help,
 		showHelp:      false,
+		insertMode:    false, // Start in normal mode (not insert mode)
 	}
 }
 
@@ -128,7 +130,6 @@ func (m *Model) SetAppCallbacks(callbacks AppCallbacks) {
 
 // Update handles UI events and state changes
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -138,50 +139,74 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-		// Handle global key shortcuts
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-
-		case "tab":
-			// Toggle focus between chat history and input area
-			if m.activeElement == ChatHistoryElement {
-				m.activeElement = InputAreaElement
-				m.inputArea.Focus()
-			} else {
+		// Different key handling based on insert mode
+		if m.insertMode {
+			// In insert mode
+			switch msg.String() {
+			case "esc":
+				// Exit insert mode
+				m.insertMode = false
 				m.activeElement = ChatHistoryElement
 				m.inputArea.Blur()
-			}
-			return m, nil
+				return m, nil
 
-		case "?":
-			m.showHelp = !m.showHelp
-			return m, nil
-
-		case "ctrl+s":
-			if m.activeElement == InputAreaElement && !m.state.IsProcessing && m.appCallbacks.SubmitMessage != nil {
-				text := m.inputArea.Value()
-				if text != "" {
-					// Clear the input area immediately for better UX
-					m.inputArea.Reset()
-					return m, m.appCallbacks.SubmitMessage(text)
+			case "ctrl+s":
+				if !m.state.IsProcessing && m.appCallbacks.SubmitMessage != nil {
+					text := m.inputArea.Value()
+					if text != "" {
+						// Clear the input area immediately for better UX
+						m.inputArea.Reset()
+						// Also exit insert mode after sending message
+						m.insertMode = false
+						m.activeElement = ChatHistoryElement
+						return m, m.appCallbacks.SubmitMessage(text)
+					}
 				}
-			}
-			return m, nil
+				return m, nil
 
-		case "ctrl+e":
-			// Open session file
-			if m.appCallbacks.OpenSessionFile != nil {
-				return m, m.appCallbacks.OpenSessionFile()
+			default:
+				// Handle all other keys in textarea
+				newTextarea, cmd := m.inputArea.Update(msg)
+				m.inputArea = newTextarea
+				return m, cmd
 			}
-			return m, nil
+		} else {
+			// Normal mode (not insert mode)
+			switch msg.String() {
+			case "ctrl+c", "q":
+				return m, tea.Quit
 
-		case "ctrl+y":
-			// Edit context files
-			if m.appCallbacks.EditContextFiles != nil {
-				return m, m.appCallbacks.EditContextFiles()
+			case "i":
+				// Enter insert mode
+				m.insertMode = true
+				m.activeElement = InputAreaElement
+				m.inputArea.Focus()
+				return m, nil
+
+			case "?":
+				m.showHelp = !m.showHelp
+				return m, nil
+
+			case "ctrl+e":
+				// Open session file
+				if m.appCallbacks.OpenSessionFile != nil {
+					return m, m.appCallbacks.OpenSessionFile()
+				}
+				return m, nil
+
+			case "ctrl+y":
+				// Edit context files
+				if m.appCallbacks.EditContextFiles != nil {
+					return m, m.appCallbacks.EditContextFiles()
+				}
+				return m, nil
+
+			default:
+				// In normal mode, handle viewport navigation
+				newViewport, cmd := m.chatHistory.Update(msg)
+				m.chatHistory = newViewport
+				return m, cmd
 			}
-			return m, nil
 		}
 
 	case tea.WindowSizeMsg:
@@ -189,9 +214,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 
-		// Resize chat history viewport
-		m.chatHistory.Width = msg.Width + 2
-		m.chatHistory.Height = msg.Height - 10
+		// Resize chat history viewport - make it larger when not in insert mode
+		m.chatHistory.Width = msg.Width - 2
+		if m.insertMode {
+			m.chatHistory.Height = msg.Height - 10 // Smaller when input is visible
+		} else {
+			m.chatHistory.Height = msg.Height - 3 // Larger when in normal mode
+		}
 
 		// Resize input area
 		m.inputArea.SetWidth(msg.Width - 2)
@@ -230,18 +259,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	// Handle active element updates
-	if m.activeElement == ChatHistoryElement {
-		newViewport, cmd := m.chatHistory.Update(msg)
-		m.chatHistory = newViewport
-		cmds = append(cmds, cmd)
-	} else {
-		newTextarea, cmd := m.inputArea.Update(msg)
-		m.inputArea = newTextarea
-		cmds = append(cmds, cmd)
-	}
-
-	return m, tea.Batch(cmds...)
+	return m, nil
 }
 
 // View renders the UI
@@ -252,25 +270,30 @@ func (m Model) View() string {
 
 	// Build the main layout
 	chatView := m.chatHistory.View()
-	inputView := m.inputArea.View()
 	statusView := m.statusBar.View(m.width)
 
-	// Apply styles based on focus
-	if m.activeElement == ChatHistoryElement {
-		chatView = focusedBorderStyle.Render(chatView)
-		inputView = blurredBorderStyle.Render(inputView)
-	} else {
-		chatView = blurredBorderStyle.Render(chatView)
-		inputView = focusedBorderStyle.Render(inputView)
+	// In normal mode, don't show the input area
+	if !m.insertMode {
+		// When not in insert mode, just show chat history and status bar
+		return lipgloss.JoinVertical(
+			lipgloss.Left,
+			titleStyle.Render("Cir - Chat Interface"),
+			focusedBorderStyle.Render(chatView), // Always focused in normal mode
+			statusView,
+			modeIndicatorStyle.Render("NORMAL"), // Show mode indicator
+		)
 	}
 
-	// Combine the views
+	// In insert mode, show input area too
+	inputView := m.inputArea.View()
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		titleStyle.Render("Cir - Chat Interface"),
-		chatView,
+		blurredBorderStyle.Render(chatView), // Always blurred in insert mode
 		statusView,
-		inputView,
+		focusedBorderStyle.Render(inputView), // Always focused in insert mode
+		modeIndicatorStyle.Render("INSERT"),  // Show mode indicator
 	)
 }
 
@@ -326,4 +349,9 @@ var (
 	blurredBorderStyle = lipgloss.NewStyle().
 				BorderStyle(lipgloss.RoundedBorder()).
 				BorderForeground(lipgloss.Color("238"))
+
+	modeIndicatorStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFFFFF")).
+				Background(lipgloss.Color("#444444")).
+				Padding(0, 1)
 )
