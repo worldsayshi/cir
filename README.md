@@ -20,9 +20,7 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
 
 # Key bindings
 
-- Ctrl-o - Manage context
-- Ctrl-s - Submit message
-- (Shift-)Tab - Toggle focus between input and chat history
+Type '?' to get key bindings.
 
 # Run from this repo
 
