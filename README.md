@@ -1,5 +1,4 @@
-
-A LLM Chat client on the terminal built with `tview`.
+A LLM Chat client on the terminal built with `bubbletea`.
 
 Status: Alpha-ish
 
@@ -20,9 +19,12 @@ For a separate session, use the `-session` flag like this: `cir -session my-sess
 
 # Key bindings
 
-- Ctrl-o - Manage context
-- Ctrl-s - Submit message
-- (Shift-)Tab - Toggle focus between input and chat history
+- Ctrl+S - Submit message
+- Tab - Toggle focus between input and chat history
+- Ctrl+E - Open session file
+- Ctrl+Y - Edit context files
+- ? - Show help
+- Ctrl+C or Q - Quit
 
 # Run from this repo
 
@@ -37,11 +39,6 @@ go test ./...
 ```
 
 # Backlog
-
-## Better engine?
-
-- Maybe use the [cview fork instead](https://codeberg.org/tslocum/cview)
-    - it seems to have more maintainers and has merged more PR:s
 
 ## Styling of chat history
 
@@ -80,13 +77,13 @@ Mostly feature complete but some more polish can be applied.
         - edit mode:
             - add system message -> explanation + syntax?
             - on response, split out edits from returned prompt
-- [ ] Summary of keymaps, when pressing '?'
+- [X] Summary of keymaps, when pressing '?'
 - [ ] More context info
     - [ ] Add the file names sent to the printed chat message
 - [ ] Bug: Getting `Error: <nil>` in log
 - [ ] Cleanup: Get rid of frivolous panics
-- [/] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
-    - Take inspo from this conversation maybe: https://claude.ai/chat/9efbb9f6-4bbc-48e7-ac35-f825dbdae7d9
+- [X] Refactor application.go so that the control flow is more DAG-like, now it's spaghet
+    - Using Bubble Tea's Elm-inspired architecture makes this much cleaner
 
 ## Session selector
 
@@ -122,3 +119,4 @@ Mostly feature complete but some more polish can be applied.
 - [X] Prompt templates for sending context
 - [X] Make the history view scrollable
 - [X] QOL: Also store the current wip chat message in the session (on exit?)
+- [X] Switch from tview to Bubble Tea for a more modern TUI experience

@@ -36,12 +36,12 @@ working_files:
 	}
 	defer os.Remove(testFilePath)
 
-	// Initialize CirApplication
+	// Initialize CirApplication - now just use it for accessing the state
 	app := NewCirApplication(tmpSessionfile.Name())
 
-	// Prepare user message
+	// Prepare user message - the test uses the same function as before, which hasn't changed
 	question := "What is the content of the test file?"
-	filesToSubmit := getFilesToSubmitWithChecksums(app.state.workingSession.WorkingFiles)
+	filesToSubmit := getFilesToSubmitWithChecksums(app.state.WorkingSession.WorkingFiles)
 	userMessage := prepareUserMessage(filesToSubmit, question)
 
 	// Check if the user message contains the expected content
