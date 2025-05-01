@@ -247,11 +247,12 @@ func (cirApp *CirApplication) openSessionFile() {
 }
 
 func (cirApp *CirApplication) editContextFiles() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m"
+	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m | cat"
 	out, err := exec.Command(
 		"bash", "-c", cmd,
 	).CombinedOutput()
 	if err != nil {
+		log.Println("Error executing command:", cmd)
 		log.Println(err)
 		return
 	}
