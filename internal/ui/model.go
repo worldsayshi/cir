@@ -10,6 +10,18 @@ import (
 	"github.com/worldsayshi/cir/internal/types"
 )
 
+// Layout constants
+const (
+	// Common layout constants
+	TitleHeight     = 1
+	StatusBarHeight = 3
+	BorderHeight    = 2 // Account for borders (1 top + 1 bottom)
+
+	// Mode-specific layout constants
+	NormalModeExtraSpace = 6  // Total space used in normal mode (title + borders + status + mode indicator)
+	InsertModeExtraSpace = 12 // Total space used in insert mode (includes input area + extra padding)
+)
+
 // Model represents the UI state and components
 type Model struct {
 	// State
@@ -130,7 +142,6 @@ func (m *Model) SetAppCallbacks(callbacks AppCallbacks) {
 
 // Update handles UI events and state changes
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// First check if help is being displayed - if so, any key closes it
@@ -148,6 +159,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.insertMode = false
 				m.activeElement = ChatHistoryElement
 				m.inputArea.Blur()
+
+				// Adjust chat history height for normal mode
+				m.chatHistory.Height = m.height - NormalModeExtraSpace
+				m.UpdateChatHistory()
+
 				return m, nil
 
 			case "ctrl+s":
@@ -159,6 +175,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						// Also exit insert mode after sending message
 						m.insertMode = false
 						m.activeElement = ChatHistoryElement
+
+						// Adjust chat history height for normal mode
+						m.chatHistory.Height = m.height - NormalModeExtraSpace
+
 						return m, m.appCallbacks.SubmitMessage(text)
 					}
 				}
@@ -181,6 +201,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.insertMode = true
 				m.activeElement = InputAreaElement
 				m.inputArea.Focus()
+
+				// Adjust chat history height for insert mode
+				m.chatHistory.Height = m.height - InsertModeExtraSpace
+				m.UpdateChatHistory()
+
 				return m, nil
 
 			case "?":
@@ -215,15 +240,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 		// Resize chat history viewport - make it larger when not in insert mode
-		m.chatHistory.Width = msg.Width
+		m.chatHistory.Width = msg.Width - BorderHeight
 		if m.insertMode {
-			m.chatHistory.Height = msg.Height - (m.inputArea.Height() + 8) // Smaller when input is visible
+			m.chatHistory.Height = msg.Height - InsertModeExtraSpace
 		} else {
-			m.chatHistory.Height = msg.Height - 6 // Larger when in normal mode
+			m.chatHistory.Height = msg.Height - NormalModeExtraSpace
 		}
 
 		// Resize input area
-		m.inputArea.SetWidth(msg.Width - 2)
+		m.inputArea.SetWidth(msg.Width - BorderHeight)
 
 		// Re-render chat history with the new width to ensure text wrapping
 		m.UpdateChatHistory()
