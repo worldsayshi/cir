@@ -10,31 +10,17 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
-	"github.com/worldsayshi/cir/internal/components"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/worldsayshi/cir/internal/storage"
 	"github.com/worldsayshi/cir/internal/types"
+	"github.com/worldsayshi/cir/internal/ui"
 )
 
-// AppState holds all application state
-type AppState struct {
-	workingSession *types.WorkingSession
-	sessionFile    string
-	isProcessing   bool
-}
-
-// CirApplication manages UI components and application lifecycle
+// CirApplication manages the application state and UI
 type CirApplication struct {
-	*tview.Application
-	state         *AppState
-	chatHistory   *components.ChatHistory
-	inputArea     *components.InputArea
-	contextBar    *components.ContextBar
-	helpPopup     *components.HelpPopup
-	rootContainer *tview.Flex
-	keyMappings   []types.KeyMapping
-	pages         *tview.Pages
+	state    *ui.AppState
+	program  *tea.Program
+	teaModel ui.Model
 }
 
 func NewCirApplication(sessionFile string) *CirApplication {
@@ -45,310 +31,122 @@ func NewCirApplication(sessionFile string) *CirApplication {
 		panic(fmt.Sprintf("Error loading session from file: %v\n%v", sessionFile, err))
 	}
 
-	state := &AppState{
-		workingSession: workingSession,
-		sessionFile:    sessionFile,
-		isProcessing:   false,
+	state := &ui.AppState{
+		WorkingSession: workingSession,
+		SessionFile:    sessionFile,
+		IsProcessing:   false,
 	}
 
-	// Initialize UI components
-	chatHistory := components.NewChatHistory(nil) // Will be populated during render
-	contextBar := components.NewContextBar(nil)   // Will be populated during render
-	inputArea := components.NewInputArea()
-	pages := tview.NewPages()
+	teaModel := ui.NewModel(state)
 
 	cirApp := &CirApplication{
-		Application: tview.NewApplication(),
-		state:       state,
-		chatHistory: chatHistory,
-		inputArea:   inputArea,
-		contextBar:  contextBar,
-		// helpPopup:     helpPopup,
-		rootContainer: tview.NewFlex().SetDirection(tview.FlexRow),
-		pages:         pages,
+		state:    state,
+		teaModel: teaModel,
 	}
-
-	// Define key mappings
-	cirApp.keyMappings = createKeyMappings(cirApp)
-	cirApp.helpPopup = components.NewHelpPopup(
-		cirApp.keyMappings,
-		cirApp.pages.HasPage,
-		func(name string, item tview.Primitive, resize, visible bool) {
-			cirApp.pages.AddPage(name, item, resize, visible)
-		},
-		func(name string) {
-			cirApp.pages.RemovePage(name)
-		},
-	)
-
-	// Set up UI event handlers
-	inputArea.SetChangedFunc(func() {
-		cirApp.updateState(func(state *AppState) bool {
-			state.workingSession.InputText = inputArea.GetText()
-			return false
-		})
-	})
-
-	inputArea.SetSubmitFunc(cirApp.handleChatSubmit)
-
-	// Setup keyboard handlers
-	cirApp.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// Special case for the '?' key since it's a rune, not a special key
-		if event.Key() == tcell.KeyRune && event.Rune() == '?' {
-			log.Println("Special case")
-			cirApp.helpPopup.ShowHelpPopup()
-			return nil
-		}
-		// If the help popup is open, for now, any key press should close it
-		if cirApp.pages.HasPage("help") {
-			cirApp.pages.RemovePage("help")
-		}
-
-		for _, mapping := range cirApp.keyMappings {
-			if event.Key() == mapping.Key {
-				log.Println("Key pressed:",
-					components.GetKeyName(event.Key()), "Action:", mapping.Description,
-				)
-				mapping.Action()
-				return nil
-			}
-		}
-		return event
-	})
-
-	// Initial render of the UI
-	cirApp.render()
 
 	return cirApp
 }
 
-func createKeyMappings(cirApp *CirApplication) []types.KeyMapping {
-	return []types.KeyMapping{
-		{
-			Key:         tcell.KeyTab,
-			Description: "Cycle focus forward",
-			Action: func() {
-				focusableElements := []tview.Primitive{cirApp.chatHistory, cirApp.inputArea}
-				cirApp.cycleFocus(focusableElements, false)
-			},
-		},
-		{
-			Key:         tcell.KeyBacktab,
-			Description: "Cycle focus backward",
-			Action: func() {
-				focusableElements := []tview.Primitive{cirApp.chatHistory, cirApp.inputArea}
-				cirApp.cycleFocus(focusableElements, true)
-			},
-		},
-		{
-			Key:         tcell.KeyCtrlE,
-			Description: "Open session file",
-			Action: func() {
-				cirApp.openSessionFile()
-			},
-		},
-		{
-			Key:         tcell.KeyCtrlY,
-			Description: "Edit context files",
-			Action: func() {
-				cirApp.editContextFiles()
-			},
-		},
-		// {
-		// 	Key:         tcell.KeyRune,
-		// 	Description: "Show help",
-		// 	Action: func() {
-		// 		log.Println("Show help")
-		// 		cirApp.helpPopup.ShowHelpPopup()
-		// 	},
-		// },
-	}
-}
-
-// updateState applies a state change function and triggers a UI update
-func (cirApp *CirApplication) updateState(updateFunc func(*AppState) bool) {
-	rerender := updateFunc(cirApp.state)
-	if rerender {
-		cirApp.render()
-	}
-
-	// Save state changes to disk
-	if err := storage.SaveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
-		log.Println("Error saving session:", err)
-	}
-}
-
-// render updates all UI components based on current state
-func (cirApp *CirApplication) render() {
-
-	cirApp.chatHistory.Render(cirApp.state.workingSession.Messages)
-	cirApp.contextBar.Render(cirApp.state.workingSession.WorkingFiles)
-	cirApp.inputArea.SetText(cirApp.state.workingSession.InputText, false)
-
-	cirApp.inputArea.SetDisabled(cirApp.state.isProcessing)
-
-	// Set up the layout if it hasn't been done yet
-	if cirApp.rootContainer.GetItemCount() == 0 {
-		cirApp.rootContainer.
-			AddItem(cirApp.chatHistory, 0, 5, false).
-			AddItem(cirApp.contextBar, 0, 1, false).
-			AddItem(cirApp.inputArea, 0, 2, true)
-
-		// Add the main UI to the pages
-		cirApp.pages.AddPage("main", cirApp.rootContainer, true, true)
-		cirApp.SetRoot(cirApp.pages, true)
-		cirApp.SetFocus(cirApp.inputArea)
-	}
-}
-
-// Pages returns the application's pages component
-func (cirApp *CirApplication) Pages() *tview.Pages {
-	return cirApp.pages
-}
-
-// From: https://github.com/rivo/tview/issues/100#issuecomment-763131391
-func (cirApp *CirApplication) cycleFocus(elements []tview.Primitive, reverse bool) {
-	for i, el := range elements {
-		if !el.HasFocus() {
-			continue
-		}
-
-		if reverse {
-			i = i - 1
-			if i < 0 {
-				i = len(elements) - 1
-			}
-		} else {
-			i = i + 1
-			i = i % len(elements)
-		}
-
-		cirApp.SetFocus(elements[i])
-		return
-	}
-}
-
-func (cirApp *CirApplication) openSessionFile() {
-	sessionFindingCommand := `(dir=$(pwd); while [ "$dir" != "/" ]; do find "$dir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; if [ -d "$dir/.cir" ]; then find "$dir/.cir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; fi; dir=$(dirname "$dir"); done)`
-	tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m`
-	out, err := exec.Command(
-		"bash", "-c", tmuxSessionFindingCommand,
-	).CombinedOutput()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	filePath := strings.TrimSpace(string(out))
-	if filePath == "" {
-		return
-	}
-
-	// Load the selected session file
-	newWorkingSession, err := storage.LoadWorkingSession(filePath)
-	if err != nil {
-		log.Printf("Error loading session from file: %v\n%v", filePath, err)
-		return
-	}
-
-	// Update state with new session
-	cirApp.updateState(func(state *AppState) bool {
-		state.workingSession = newWorkingSession
-		state.sessionFile = filePath
-		return true
+func (cirApp *CirApplication) Init() {
+	// Set up callback functions for the UI
+	cirApp.teaModel.SetAppCallbacks(ui.AppCallbacks{
+		SubmitMessage:    cirApp.SubmitMessage,
+		OpenSessionFile:  cirApp.OpenSessionFile,
+		EditContextFiles: cirApp.EditContextFiles,
 	})
-}
 
-func (cirApp *CirApplication) editContextFiles() {
-	cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m | cat"
-	out, err := exec.Command(
-		"bash", "-c", cmd,
-	).CombinedOutput()
-	if err != nil {
-		log.Println("Error executing command:", cmd)
-		log.Println(err)
-		return
+	// Update the UI with the loaded session data
+	cirApp.teaModel.UpdateChatHistory()
+	cirApp.teaModel.UpdateContextBar()
+
+	// Set the input text from the session
+	if cirApp.state.WorkingSession.InputText != "" {
+		cirApp.teaModel.SetInputText(cirApp.state.WorkingSession.InputText)
 	}
-
-	contextFiles := strings.Split(string(out), "\n")
-	// filter out empty strings
-	selectedWorkingFiles := []types.WorkingFile{}
-	for _, f := range contextFiles {
-		if f != "" {
-			selectedWorkingFiles = append(selectedWorkingFiles, types.WorkingFile{Path: f})
-		}
-	}
-
-	cirApp.updateState(func(state *AppState) bool {
-		state.workingSession.WorkingFiles = selectedWorkingFiles
-		return true
-	})
 }
 
 func (cirApp *CirApplication) Run() error {
-	if err := cirApp.Application.Run(); err != nil {
+	// Initialize Bubble Tea
+	p := tea.NewProgram(cirApp.teaModel, tea.WithAltScreen())
+	cirApp.program = p
+
+	// Run the Bubble Tea program
+	model, err := p.Run()
+	if err != nil {
 		return err
 	}
 
+	// Extract the final model state
+	finalModel := model.(ui.Model)
+
+	// Update input text in session with what's in the input area
+	cirApp.state.WorkingSession.InputText = finalModel.GetInputText()
+
 	// Final save before exiting
-	if err := storage.SaveWorkingSession(cirApp.state.sessionFile, cirApp.state.workingSession); err != nil {
+	if err := storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession); err != nil {
 		log.Println("Error saving session:", err)
 	}
 
 	return nil
 }
 
-func (cirApp *CirApplication) handleChatSubmit(text string) {
-	if text == "" {
-		return
-	}
+// Process server-side logic for submitting messages
+func (cirApp *CirApplication) SubmitMessage(text string) tea.Cmd {
+	return func() tea.Msg {
+		if text == "" {
+			return nil
+		}
 
-	cirApp.updateState(func(state *AppState) bool {
 		// Initialize with system message if needed
-		if len(state.workingSession.Messages) == 0 {
-			state.workingSession.Messages = append(state.workingSession.Messages,
+		if len(cirApp.state.WorkingSession.Messages) == 0 {
+			cirApp.state.WorkingSession.Messages = append(cirApp.state.WorkingSession.Messages,
 				createSystemMessage())
 		}
 
-		filesToSubmit := getFilesToSubmitWithChecksums(state.workingSession.WorkingFiles)
+		filesToSubmit := getFilesToSubmitWithChecksums(cirApp.state.WorkingSession.WorkingFiles)
 		userMessage := prepareUserMessage(filesToSubmit, text)
 
 		// Add user message
-		state.workingSession.Messages = append(
-			state.workingSession.Messages, userMessage,
+		cirApp.state.WorkingSession.Messages = append(
+			cirApp.state.WorkingSession.Messages, userMessage,
 		)
 
 		// Update file checksums
-		for i, wf := range state.workingSession.WorkingFiles {
+		for i, wf := range cirApp.state.WorkingSession.WorkingFiles {
 			for _, wfSubmit := range filesToSubmit {
 				if wf.Path == wfSubmit.Path {
-					state.workingSession.WorkingFiles[i] = wfSubmit
+					cirApp.state.WorkingSession.WorkingFiles[i] = wfSubmit
 				}
 			}
 		}
 
 		// Clear input and set processing state
-		state.workingSession.InputText = ""
-		state.isProcessing = true
+		cirApp.state.WorkingSession.InputText = ""
+		cirApp.state.IsProcessing = true
 
 		// Add empty message for streaming response
-		state.workingSession.Messages = append(
-			state.workingSession.Messages,
+		cirApp.state.WorkingSession.Messages = append(
+			cirApp.state.WorkingSession.Messages,
 			types.Message{
 				AiServiceMessage: types.AiServiceMessage{Role: "assistant", Content: ""},
 			},
 		)
-		return true
-	})
 
-	// Get service messages for API call
-	serviceMessages := getServiceMessages(cirApp.state.workingSession.Messages)
+		// Save state after changes
+		storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession)
 
-	// Start streaming
-	resultChan, errChan := streamOpenAI(serviceMessages)
+		// Notify UI of changes
+		cirApp.program.Send(ui.SessionUpdatedMsg{})
 
-	// Create a goroutine to handle streaming updates
-	go cirApp.handleStreamResponse(resultChan, errChan)
+		// Get service messages for API call
+		serviceMessages := getServiceMessages(cirApp.state.WorkingSession.Messages)
+
+		// Start streaming in a goroutine
+		resultChan, errChan := streamOpenAI(serviceMessages)
+		go cirApp.handleStreamResponse(resultChan, errChan)
+
+		return ui.SubmitMessageMsg{Text: text}
+	}
 }
 
 func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errChan chan error) {
@@ -359,37 +157,123 @@ func (cirApp *CirApplication) handleStreamResponse(resultChan chan string, errCh
 		case chunk, ok := <-resultChan:
 			if !ok {
 				// Stream completed
-				cirApp.updateState(func(state *AppState) bool {
-					state.isProcessing = false
-					return true
-				})
+				cirApp.state.IsProcessing = false
+
+				// Save the final response
+				storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession)
+
+				cirApp.program.Send(ui.StreamResponseDoneMsg{})
 				return
 			}
 
 			accumulated += chunk
 
-			cirApp.updateState(func(state *AppState) bool {
-				lastIdx := len(state.workingSession.Messages) - 1
-				state.workingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
-				return true
-			})
+			// Update the message content with accumulated text
+			lastIdx := len(cirApp.state.WorkingSession.Messages) - 1
+			cirApp.state.WorkingSession.Messages[lastIdx].AiServiceMessage.Content = accumulated
+
+			// Send the chunk to the UI for display
+			cirApp.program.Send(ui.StreamResponseChunkMsg{Chunk: chunk})
 
 		case err := <-errChan:
 			log.Printf("Error: %v", err)
 			if err != nil {
-				cirApp.updateState(func(state *AppState) bool {
-					lastIdx := len(state.workingSession.Messages) - 1
-					state.workingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
-					state.isProcessing = false
-					return true
-				})
+				// Update the message content with error
+				lastIdx := len(cirApp.state.WorkingSession.Messages) - 1
+				cirApp.state.WorkingSession.Messages[lastIdx].Content = fmt.Sprintf("Error: %v", err)
+
+				// Set processing to false
+				cirApp.state.IsProcessing = false
+
+				// Save the error state
+				storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession)
+
+				// Notify UI of error
+				cirApp.program.Send(ui.StreamResponseErrorMsg{Err: err})
 				return
 			}
 		}
 	}
 }
 
-// Add WorkingFiles to the content iff checksum is nill or changed
+// OpenSessionFile opens a session selector to load a different session
+func (cirApp *CirApplication) OpenSessionFile() tea.Cmd {
+	return func() tea.Msg {
+		// Exit alt screen mode temporarily to allow fzf to work
+		if cirApp.program != nil {
+			cirApp.program.ExitAltScreen()
+			defer cirApp.program.EnterAltScreen()
+		}
+
+		sessionFindingCommand := `(dir=$(pwd); while [ "$dir" != "/" ]; do find "$dir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; if [ -d "$dir/.cir" ]; then find "$dir/.cir" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -exec grep -l "^kind: WorkingSession" {} \; 2>/dev/null; fi; dir=$(dirname "$dir"); done)`
+		tmuxSessionFindingCommand := sessionFindingCommand + ` | fzf-tmux -h -m`
+		out, err := exec.Command(
+			"bash", "-c", tmuxSessionFindingCommand,
+		).CombinedOutput()
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+
+		filePath := strings.TrimSpace(string(out))
+		if filePath == "" {
+			return nil
+		}
+
+		// Load the selected session file
+		newWorkingSession, err := storage.LoadWorkingSession(filePath)
+		if err != nil {
+			log.Printf("Error loading session from file: %v\n%v", filePath, err)
+			return nil
+		}
+
+		// Update state with new session
+		cirApp.state.WorkingSession = newWorkingSession
+		cirApp.state.SessionFile = filePath
+
+		// Save new session
+		storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession)
+
+		return ui.SessionUpdatedMsg{}
+	}
+}
+
+// EditContextFiles allows selecting context files
+func (cirApp *CirApplication) EditContextFiles() tea.Cmd {
+	return func() tea.Msg {
+		// Exit alt screen mode temporarily to allow fzf to work
+		if cirApp.program != nil {
+			cirApp.program.ExitAltScreen()
+			defer cirApp.program.EnterAltScreen()
+		}
+
+		cmd := "find . -type f -not -path '*/.*' | fzf-tmux -h -m | cat"
+		out, err := exec.Command(
+			"bash", "-c", cmd,
+		).CombinedOutput()
+		if err != nil {
+			log.Println("Error executing command:", cmd)
+			log.Println(err)
+			return nil
+		}
+
+		contextFiles := strings.Split(string(out), "\n")
+		// filter out empty strings
+		selectedWorkingFiles := []types.WorkingFile{}
+		for _, f := range contextFiles {
+			if f != "" {
+				selectedWorkingFiles = append(selectedWorkingFiles, types.WorkingFile{Path: f})
+			}
+		}
+
+		cirApp.state.WorkingSession.WorkingFiles = selectedWorkingFiles
+		storage.SaveWorkingSession(cirApp.state.SessionFile, cirApp.state.WorkingSession)
+
+		return ui.SessionUpdatedMsg{}
+	}
+}
+
+// Add WorkingFiles to the content iff checksum is nil or changed
 func getFilesToSubmitWithChecksums(wfs []types.WorkingFile) []types.WorkingFile {
 	filesToSubmit := []types.WorkingFile{}
 	for _, wf := range wfs {
@@ -466,8 +350,3 @@ print("Hello, World!")
 	}
 	return systemMessage
 }
-
-// GetKeyMappings returns the application's key mappings
-// func (cirApp *CirApplication) GetKeyMappings() []KeyMapping {
-// 	return cirApp.keyMappings
-// }
