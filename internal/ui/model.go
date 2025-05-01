@@ -61,6 +61,7 @@ func NewModel(state *AppState) Model {
 	ta.ShowLineNumbers = false
 	ta.SetWidth(80)
 	ta.SetHeight(4)
+	ta.Focus() // Make sure the textarea is focused from the start
 
 	// Set up the chat history viewport
 	vp := viewport.New(80, 20)
@@ -85,7 +86,7 @@ func NewModel(state *AppState) Model {
 
 // Init initializes the model
 func (m Model) Init() tea.Cmd {
-	return nil
+	return textarea.Blink
 }
 
 // UpdateChatHistory updates the chat history content
@@ -129,7 +130,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Global key handlers
+		// First check if help is being displayed - if so, any key closes it
+		if m.showHelp {
+			m.showHelp = false
+			return m, nil
+		}
+
+		// Handle global key shortcuts
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
@@ -138,8 +145,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// Toggle focus between chat history and input area
 			if m.activeElement == ChatHistoryElement {
 				m.activeElement = InputAreaElement
+				m.inputArea.Focus()
 			} else {
 				m.activeElement = ChatHistoryElement
+				m.inputArea.Blur()
 			}
 			return m, nil
 
@@ -178,15 +187,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 
-		headerHeight := 1
-		footerHeight := 7 // Input area + status bar
-
 		// Resize chat history viewport
-		m.chatHistory.Width = msg.Width
-		m.chatHistory.Height = msg.Height - headerHeight - footerHeight
+		m.chatHistory.Width = msg.Width - 2
+		m.chatHistory.Height = msg.Height - 10
 
 		// Resize input area
-		m.inputArea.SetWidth(msg.Width - 4)
+		m.inputArea.SetWidth(msg.Width - 2)
 
 		return m, nil
 
