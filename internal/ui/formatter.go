@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -27,6 +26,13 @@ var (
 
 	separatorStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#555555"))
+
+	selectedHeaderStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFD700")).
+				Bold(true)
+
+	selectedContentStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFD700"))
 )
 
 // wrapText wraps the text to the specified width
@@ -72,8 +78,8 @@ func wrapText(text string, width int) string {
 	return wrapped.String()
 }
 
-// formatChatHistory converts message list to formatted string
-func formatChatHistory(messages []types.Message, width int) string {
+// formatChatHistory converts message list to formatted string with highlighting for selected message
+func formatChatHistory(messages []types.Message, width int, selectedIndex int) string {
 	if len(messages) == 0 {
 		return "No messages yet. Type a message and press Ctrl+S to send."
 	}
@@ -85,32 +91,62 @@ func formatChatHistory(messages []types.Message, width int) string {
 	}
 
 	var formatted strings.Builder
-	separator := separatorStyle.Render(strings.Repeat("─", min(50, contentWidth)))
 
-	for _, msg := range messages {
-		// Add separator between messages
-		if formatted.Len() > 0 {
+	for i, msg := range messages {
+		// Add separator between messages, but not before the first one
+		if i > 0 {
+			separator := separatorStyle.Render(strings.Repeat("─", min(50, contentWidth)))
 			formatted.WriteString("\n" + separator + "\n\n")
+		}
+
+		// Determine if this message is selected
+		isSelected := i == selectedIndex
+
+		// Create style based on selection state
+		var headerStyle, contentTextStyle lipgloss.Style
+		var prefix string
+
+		if isSelected {
+			// Highlight the message when selected
+			headerStyle = selectedHeaderStyle
+			contentTextStyle = selectedContentStyle
+			prefix = "▶ " // Add indicator for selected message
+		} else {
+			// Normal styling when not selected
+			prefix = "  " // Space for alignment
+
+			switch msg.Role {
+			case "user":
+				headerStyle = userStyle
+			case "assistant":
+				headerStyle = assistantStyle
+			case "system":
+				headerStyle = systemStyle
+			default:
+				headerStyle = lipgloss.NewStyle()
+			}
+			contentTextStyle = contentStyle
 		}
 
 		// Format message header based on role
 		switch msg.Role {
 		case "user":
-			formatted.WriteString(userStyle.Render("User") + "\n")
+			formatted.WriteString(prefix + headerStyle.Render("User") + "\n")
 			// If we have a question field, use that instead of content
 			if msg.Question != "" {
-				formatted.WriteString(contentStyle.Render(wrapText(msg.Question, contentWidth)) + "\n")
+				formatted.WriteString(prefix + contentTextStyle.Render(wrapText(msg.Question, contentWidth-2)) + "\n")
 			} else {
-				formatted.WriteString(contentStyle.Render(wrapText(msg.Content, contentWidth)) + "\n")
+				formatted.WriteString(prefix + contentTextStyle.Render(wrapText(msg.Content, contentWidth-2)) + "\n")
 			}
 		case "assistant":
-			formatted.WriteString(assistantStyle.Render("Assistant") + "\n")
-			formatted.WriteString(contentStyle.Render(wrapText(msg.Content, contentWidth)) + "\n")
+			formatted.WriteString(prefix + headerStyle.Render("Assistant") + "\n")
+			formatted.WriteString(prefix + contentTextStyle.Render(wrapText(msg.Content, contentWidth-2)) + "\n")
 		case "system":
-			formatted.WriteString(systemStyle.Render("System") + "\n")
-			formatted.WriteString(contentStyle.Render(wrapText(msg.Content, contentWidth)) + "\n")
+			formatted.WriteString(prefix + headerStyle.Render("System") + "\n")
+			formatted.WriteString(prefix + contentTextStyle.Render(wrapText(msg.Content, contentWidth-2)) + "\n")
 		default:
-			formatted.WriteString(fmt.Sprintf("%s:\n%s\n", msg.Role, wrapText(msg.Content, contentWidth)))
+			formatted.WriteString(prefix + headerStyle.Render(msg.Role) + "\n")
+			formatted.WriteString(prefix + contentTextStyle.Render(wrapText(msg.Content, contentWidth-2)) + "\n")
 		}
 	}
 
@@ -120,6 +156,14 @@ func formatChatHistory(messages []types.Message, width int) string {
 // min returns the minimum of two integers
 func min(a, b int) int {
 	if a < b {
+		return a
+	}
+	return b
+}
+
+// max returns the maximum of two integers
+func max(a, b int) int {
+	if a > b {
 		return a
 	}
 	return b

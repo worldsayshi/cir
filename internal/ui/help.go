@@ -20,9 +20,10 @@ func (m helpModel) View() string {
   Normal Mode:
   i : Enter insert mode
   ? : Show/hide this help
+  h/l : Navigate between previous/next messages
+  j/k, ↑/↓ : Scroll chat history up/down
   ctrl+e : Open session file
   ctrl+y : Edit context files
-  j/k, ↑/↓ : Scroll chat history up/down
 
   Insert Mode:
   esc : Return to normal mode

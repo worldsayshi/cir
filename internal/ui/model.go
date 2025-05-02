@@ -2,6 +2,8 @@ package ui
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -25,11 +27,12 @@ const (
 // Model represents the UI state and components
 type Model struct {
 	// State
-	state         *AppState
-	activeElement ActiveElement
-	help          helpModel
-	showHelp      bool
-	insertMode    bool // Flag to track if we're in insert mode
+	state            *AppState
+	activeElement    ActiveElement
+	help             helpModel
+	showHelp         bool
+	insertMode       bool // Flag to track if we're in insert mode
+	selectedMsgIndex int  // Currently selected message in chat history
 
 	// UI Components
 	chatHistory viewport.Model
@@ -87,14 +90,15 @@ func NewModel(state *AppState) Model {
 	statusBar := NewStatusBarModel()
 
 	return Model{
-		state:         state,
-		activeElement: ChatHistoryElement, // Start with focus on chat history
-		chatHistory:   vp,
-		inputArea:     ta,
-		statusBar:     statusBar,
-		help:          help,
-		showHelp:      false,
-		insertMode:    false, // Start in normal mode (not insert mode)
+		state:            state,
+		activeElement:    ChatHistoryElement, // Start with focus on chat history
+		chatHistory:      vp,
+		inputArea:        ta,
+		statusBar:        statusBar,
+		help:             help,
+		showHelp:         false,
+		insertMode:       false, // Start in normal mode (not insert mode)
+		selectedMsgIndex: -1,    // Initialize with no selected message
 	}
 }
 
@@ -111,9 +115,70 @@ func (m *Model) UpdateChatHistory() {
 
 	// Use the current width for proper text wrapping
 	width := m.chatHistory.Width
-	content := formatChatHistory(m.state.WorkingSession.Messages, width)
+	content := formatChatHistory(m.state.WorkingSession.Messages, width, m.selectedMsgIndex)
 	m.chatHistory.SetContent(content)
+
+	// If no message is selected and we have messages, select the latest one
+	if m.selectedMsgIndex == -1 && len(m.state.WorkingSession.Messages) > 0 {
+		m.selectedMsgIndex = len(m.state.WorkingSession.Messages) - 1
+		// Re-render with the selection
+		content = formatChatHistory(m.state.WorkingSession.Messages, width, m.selectedMsgIndex)
+		m.chatHistory.SetContent(content)
+	}
+
 	m.chatHistory.GotoBottom()
+}
+
+// scrollToSelectedMessage scrolls the viewport to make the selected message visible
+func (m *Model) scrollToSelectedMessage() {
+	if m.selectedMsgIndex < 0 || len(m.state.WorkingSession.Messages) == 0 {
+		return
+	}
+
+	// Calculate approximate position of selected message
+	content := m.chatHistory.View()
+	lines := strings.Split(content, "\n")
+
+	// Find the position by looking for the message indicator
+	messageStartLine := 0
+	currentMessage := -1 // Start at -1 so we properly count the first message as 0
+
+	log.Println("lines:", len(lines))
+
+	// SOMETHING IS WRONG HERE
+	// We need to find the line number of the selected message
+	for i, line := range lines {
+		// Look for the indicator prefix or role headers at the start of lines
+		trimmedLine := strings.TrimSpace(line)
+		log.Println(trimmedLine, strings.HasPrefix(trimmedLine, "Assistant"))
+		// Check if this is a header line (either with the indicator or as a regular header)
+		if strings.HasPrefix(trimmedLine, "User") ||
+			strings.HasPrefix(trimmedLine, "Assistant") ||
+			strings.HasPrefix(trimmedLine, "System") {
+
+			log.Printf("Found message header at line %d: %s", i, trimmedLine)
+			// If we found a header, we're at a new message
+			currentMessage += 1
+			log.Printf("Current message index: %d", currentMessage)
+
+			log.Println("", i, m.selectedMsgIndex)
+			// If this is our target message, record its position
+			if currentMessage == m.selectedMsgIndex {
+				messageStartLine = i
+				break
+			}
+		}
+
+	}
+
+	log.Printf("Selected message index: %d, Start line: %d", m.selectedMsgIndex, messageStartLine)
+
+	// Scroll to position with some context
+	if messageStartLine > 0 {
+		// Adjust the viewport to show the selected message with some context
+		targetLine := max(0, messageStartLine-2) // 2 lines above for context
+		m.chatHistory.SetYOffset(targetLine)
+	}
 }
 
 // UpdateContextBar updates the context bar with working files
@@ -223,6 +288,30 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// Edit context files
 				if m.appCallbacks.EditContextFiles != nil {
 					return m, m.appCallbacks.EditContextFiles()
+				}
+				return m, nil
+
+			case "h":
+				// Previous message
+				if !m.insertMode && len(m.state.WorkingSession.Messages) > 0 {
+					// Go to previous message if not at the first one
+					if m.selectedMsgIndex > 0 {
+						m.selectedMsgIndex--
+						m.UpdateChatHistory()
+						m.scrollToSelectedMessage() // Scroll to make the selected message visible
+					}
+				}
+				return m, nil
+
+			case "l":
+				// Next message
+				if !m.insertMode && len(m.state.WorkingSession.Messages) > 0 {
+					// Go to next message if not at the last one
+					if m.selectedMsgIndex < len(m.state.WorkingSession.Messages)-1 {
+						m.selectedMsgIndex++
+						m.UpdateChatHistory()
+						m.scrollToSelectedMessage() // Scroll to make the selected message visible
+					}
 				}
 				return m, nil
 
