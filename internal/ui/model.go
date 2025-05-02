@@ -143,34 +143,27 @@ func (m *Model) scrollToSelectedMessage() {
 	messageStartLine := 0
 	currentMessage := -1 // Start at -1 so we properly count the first message as 0
 
-	log.Println("lines:", len(lines))
-
-	// SOMETHING IS WRONG HERE
-	// We need to find the line number of the selected message
 	for i, line := range lines {
-		// Look for the indicator prefix or role headers at the start of lines
-		trimmedLine := strings.TrimSpace(line)
-		log.Println(trimmedLine, strings.HasPrefix(trimmedLine, "Assistant"))
-		// Check if this is a header line (either with the indicator or as a regular header)
-		if strings.HasPrefix(trimmedLine, "User") ||
-			strings.HasPrefix(trimmedLine, "Assistant") ||
-			strings.HasPrefix(trimmedLine, "System") {
+		// Strip ANSI color codes before checking for role headers
+		cleanLine := stripANSI(line)
+		trimmedCleanLine := strings.TrimSpace(cleanLine)
 
-			log.Printf("Found message header at line %d: %s", i, trimmedLine)
+		// Check if this is a header line (either with the indicator or as a role header)
+		if strings.HasPrefix(trimmedCleanLine, "▶") ||
+			strings.HasPrefix(trimmedCleanLine, "User") ||
+			strings.HasPrefix(trimmedCleanLine, "Assistant") ||
+			strings.HasPrefix(trimmedCleanLine, "System") {
+
 			// If we found a header, we're at a new message
-			currentMessage += 1
-			log.Printf("Current message index: %d", currentMessage)
+			currentMessage++
 
-			log.Println("", i, m.selectedMsgIndex)
 			// If this is our target message, record its position
 			if currentMessage == m.selectedMsgIndex {
 				messageStartLine = i
 				break
 			}
 		}
-
 	}
-
 	log.Printf("Selected message index: %d, Start line: %d", m.selectedMsgIndex, messageStartLine)
 
 	// Scroll to position with some context

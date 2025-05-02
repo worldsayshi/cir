@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -76,6 +77,12 @@ func wrapText(text string, width int) string {
 	}
 
 	return wrapped.String()
+}
+
+// stripANSI removes ANSI color and style codes from a string
+func stripANSI(str string) string {
+	ansiRegex := regexp.MustCompile(`\x1b\[[0-9;]*m`)
+	return ansiRegex.ReplaceAllString(str, "")
 }
 
 // formatChatHistory converts message list to formatted string with highlighting for selected message
