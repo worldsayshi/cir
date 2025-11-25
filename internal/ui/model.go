@@ -135,36 +135,79 @@ func (m *Model) scrollToSelectedMessage() {
 		return
 	}
 
+	// Get a map of which messages are visible in the UI
+	visibleMsgIndices := make(map[int]bool)
+	for i, msg := range m.state.WorkingSession.Messages {
+		// System messages might not be visible in the UI
+		if msg.Role != "system" {
+			visibleMsgIndices[i] = true
+		}
+	}
+
+	// Count how many visible messages come before our target
+	visibleMessagesBefore := 0
+	for i := 0; i < m.selectedMsgIndex; i++ {
+		if visibleMsgIndices[i] {
+			visibleMessagesBefore++
+		}
+	}
+
+	// If our selected message is a system message (not visible), find the next visible message
+	adjustedIndex := m.selectedMsgIndex
+	if !visibleMsgIndices[m.selectedMsgIndex] {
+		// Find the next visible message
+		for i := m.selectedMsgIndex + 1; i < len(m.state.WorkingSession.Messages); i++ {
+			if visibleMsgIndices[i] {
+				adjustedIndex = i
+				break
+			}
+		}
+		// If no next visible message, find previous visible message
+		if adjustedIndex == m.selectedMsgIndex {
+			for i := m.selectedMsgIndex - 1; i >= 0; i-- {
+				if visibleMsgIndices[i] {
+					adjustedIndex = i
+					break
+				}
+			}
+		}
+	}
+
 	// Calculate approximate position of selected message
 	content := m.chatHistory.View()
 	lines := strings.Split(content, "\n")
 
-	// Find the position by looking for the message indicator
+	// Find the position by looking for the message indicator or role headers
 	messageStartLine := 0
-	currentMessage := -1 // Start at -1 so we properly count the first message as 0
+	currentVisibleMessage := -1 // Track visible messages (excluding system)
 
 	for i, line := range lines {
-		// Strip ANSI color codes before checking for role headers
+		// Strip ANSI color codes before checking
 		cleanLine := stripANSI(line)
 		trimmedCleanLine := strings.TrimSpace(cleanLine)
 
-		// Check if this is a header line (either with the indicator or as a role header)
+		// Check if this is a header line (with the indicator or as a role header)
 		if strings.HasPrefix(trimmedCleanLine, "▶") ||
 			strings.HasPrefix(trimmedCleanLine, "User") ||
-			strings.HasPrefix(trimmedCleanLine, "Assistant") ||
-			strings.HasPrefix(trimmedCleanLine, "System") {
+			strings.HasPrefix(trimmedCleanLine, "Assistant") {
 
-			// If we found a header, we're at a new message
-			currentMessage++
+			// Found a visible message header
+			currentVisibleMessage++
 
-			// If this is our target message, record its position
-			if currentMessage == m.selectedMsgIndex {
+			log.Printf("Visible message %d found at line %d: %s\n", currentVisibleMessage, i, trimmedCleanLine)
+
+			log.Printf("currentVisibleMessage: %d, adjustedIndex: %d\n", currentVisibleMessage, adjustedIndex)
+			log.Printf("Selected message %d: %s\n", adjustedIndex, trimmedCleanLine)
+			log.Printf("Visible messages before: %d\n", visibleMessagesBefore)
+			// visibleMessagesBefore
+			// If this is our target visible message, record its position
+			if currentVisibleMessage == visibleMessagesBefore {
+				log.Printf("Selected message %d found at line %d: %s\n", adjustedIndex, i, trimmedCleanLine)
 				messageStartLine = i
 				break
 			}
 		}
 	}
-	log.Printf("Selected message index: %d, Start line: %d", m.selectedMsgIndex, messageStartLine)
 
 	// Scroll to position with some context
 	if messageStartLine > 0 {
